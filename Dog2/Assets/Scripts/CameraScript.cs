@@ -292,6 +292,7 @@ public class CameraScript : MonoBehaviour
     {
         Debug.Log("Question");  
         alphabet.questionCounter++;
+        alphabet.questionSound.Play();
         alphabet.questionDestinationRotation = alphabet.questionHandRotations[alphabet.questionCounter];
         if (!isDialogueStarted) return;
         alphabet.movingToNextQuestion = false;

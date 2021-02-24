@@ -186,7 +186,7 @@ public class AlphabetaScript : MonoBehaviour
 	private float gameTimeScale = 1;
 	private float timescaleTarget = 1;
 	private float timescaleTargetSpeed = 4f;
-	private float timescaleTimerCount = 3.5f;
+	private float timescaleTimerCount = 4f;
 	public int questionCounter;
 	private int questionCycleCounter = 1;
 
@@ -195,7 +195,7 @@ public class AlphabetaScript : MonoBehaviour
 	private bool isTimescalePaused;
 	private Color cameraBackgroundColor;
 	private Color cameraBackgroundColorOn = new Color(.83f, .83f, .83f, 0);
-	private Color cameraBackgroundColorOff = new Color(.08f, .08f, .08f, 0);
+	private Color cameraBackgroundColorOff = new Color(.04f, .04f, .04f, 0);
 	public PostProcessVolume volumeClockBlur;
 	DepthOfField depthOfFieldClockBlur;
 	private float clockBlurTarget;
@@ -246,7 +246,7 @@ public class AlphabetaScript : MonoBehaviour
 	bool isFinalTimeScalePaused;
 
 	// important variables to play with
-	private bool isDebugModeOn = true;
+	private bool isDebugModeOn = false;
 	private float resetLerpDuration = 1.5f;
 	private float clockTime = .4f; // .4 is a good one..also 1/3/5 is good proportion
 	private float lerpDuration = 1f; // 1 is a good one
@@ -272,10 +272,11 @@ public class AlphabetaScript : MonoBehaviour
 	public AudioSource droneSound;
 	public float droneTargetVolume;
 	public float droneLowVolume = .1f;
-	public float droneHighVolume = .9f;
+	public float droneHighVolume = .4f;
 	public float droneTargetPitch;
 	public float droneLowPitch = .9f;
 	public float droneHighPitch = 1.2f;
+	public AudioSource questionSound;
 
 	void Start()
 	{
@@ -392,7 +393,7 @@ public class AlphabetaScript : MonoBehaviour
 			questionHand.transform.rotation = Quaternion.Lerp(questionHand.transform.rotation, questionDestinationRotation.rotation, 1f * Time.deltaTime);
 			glow.Intensity = Mathf.Lerp(glow.Intensity, targetIntensityClock, 2 * Time.deltaTime);
 			clockMaterial.color = Color.Lerp(clockMaterial.color, clockTransparentColor, .2f * Time.deltaTime);
-			clockCameraBlur.backgroundColor = Color.Lerp(clockCameraBlur.backgroundColor, cameraBackgroundColor, 3 * Time.unscaledDeltaTime);
+			clockCameraBlur.backgroundColor = Color.Lerp(clockCameraBlur.backgroundColor, cameraBackgroundColor, 5 * Time.unscaledDeltaTime);
 			depthOfFieldClockBlur.focalLength.value = Mathf.Lerp(depthOfFieldClockBlur.focalLength.value, clockBlurTarget, 3 * Time.deltaTime);
 			pictureCanvasGroup.alpha = Mathf.Lerp(pictureCanvasGroup.alpha, pictureAlpha, 3 * Time.deltaTime);
 			glow.Intensity = Mathf.Lerp(glow.Intensity, targetIntensityClock, 2 * Time.deltaTime);
@@ -430,6 +431,8 @@ public class AlphabetaScript : MonoBehaviour
 			clockHandScrambler1.transform.rotation = Quaternion.Lerp(clockHandScrambler1.transform.rotation, destinationRotation.rotation, 2f * Time.unscaledDeltaTime);
 			clockHandScrambler2.transform.rotation = Quaternion.Lerp(clockHandScrambler2.transform.rotation, destinationRotation.rotation, 2f * Time.unscaledDeltaTime);
 			questionHand.transform.rotation = Quaternion.Lerp(questionHand.transform.rotation, destinationRotation.rotation, 2f * Time.unscaledDeltaTime);
+			droneSound.volume = Mathf.Lerp(droneSound.volume, droneTargetVolume, 1 * Time.deltaTime);
+			droneSound.pitch = Mathf.Lerp(droneSound.pitch, droneTargetPitch, 1 * Time.deltaTime);
 		}
 
 		
@@ -1105,7 +1108,10 @@ public class AlphabetaScript : MonoBehaviour
 		pictureCanvasGroup.alpha = 0;
 		string tempSound;
 		GameObject[] collectedTicks = GameObject.FindGameObjectsWithTag("MainCamera");
+		collectedTicks = collectedTicks.OrderBy(i => i.name).ToArray();
+
 		GameObject[] collectedSwaps = GameObject.FindGameObjectsWithTag("GameController");
+		collectedSwaps = collectedSwaps.OrderBy(i => i.name).ToArray();
 
 		for (int i = 0; i < tickSounds.Length; i++)
 		{
@@ -2694,6 +2700,8 @@ public class AlphabetaScript : MonoBehaviour
 
     void ResetValues()
     {
+		droneTargetPitch = .8f;
+		droneTargetVolume = .5f;
 		start = false;
 		isFinalTimeScalePaused = false;
 		finalTimescaleTimerCount = 10;
