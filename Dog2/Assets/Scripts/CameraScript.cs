@@ -214,6 +214,7 @@ public class CameraScript : MonoBehaviour
 
     public void StartQuestions()
     {
+        alphabet.droneSound.Play();
         spotlightTargetIntensity = 1f;
         isDialogueStarted = true;
         alphabet.questionCounter = 1;

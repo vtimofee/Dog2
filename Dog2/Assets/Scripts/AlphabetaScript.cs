@@ -265,7 +265,18 @@ public class AlphabetaScript : MonoBehaviour
 	float startScrambleLerpDuration = 3f;
 	float startScrambleLerpDuration2 = 3f;
 	bool isResetting;
-	
+	public AudioSource tic;
+	public AudioSource[] tickSounds = new AudioSource[30];
+	public AudioSource[] swapSounds = new AudioSource[10];
+	int soundCounter;
+	public AudioSource droneSound;
+	public float droneTargetVolume;
+	public float droneLowVolume = .1f;
+	public float droneHighVolume = .9f;
+	public float droneTargetPitch;
+	public float droneLowPitch = .9f;
+	public float droneHighPitch = 1.2f;
+
 	void Start()
 	{
         for (int i = 1; i < Display.displays.Length; i++)
@@ -283,6 +294,8 @@ public class AlphabetaScript : MonoBehaviour
 			timescaleTimerCount = .5f;
 			punctuationDelay = .1f;
 		}
+		droneTargetPitch = droneHighPitch;
+		droneSound.volume = droneLowVolume;
 		radialTargetColor = new Color(1, 1, 1, 1);
 		clockFaceTargetScale = clockFace.transform.localScale;
 		clockFaceScaleMin.x = clockFaceTargetScale.x * .95f;
@@ -346,6 +359,8 @@ public class AlphabetaScript : MonoBehaviour
 				timescaleTimerCount -= Time.unscaledDeltaTime;
 				if(timescaleTimerCount <= 0)
                 {
+					droneTargetPitch = droneHighPitch;
+					droneTargetVolume = droneLowVolume;
 					timescaleTarget = 1f;
 					cameraBackgroundColor = cameraBackgroundColorOn;
 					isTimescalePaused = false;
@@ -382,6 +397,8 @@ public class AlphabetaScript : MonoBehaviour
 			pictureCanvasGroup.alpha = Mathf.Lerp(pictureCanvasGroup.alpha, pictureAlpha, 3 * Time.deltaTime);
 			glow.Intensity = Mathf.Lerp(glow.Intensity, targetIntensityClock, 2 * Time.deltaTime);
 			clockFace.transform.localScale = Vector3.Lerp(clockFace.transform.localScale, clockFaceScaleMin, .2f * Time.deltaTime);
+			droneSound.volume = Mathf.Lerp(droneSound.volume, droneTargetVolume, 2 * Time.deltaTime);
+			droneSound.pitch = Mathf.Lerp(droneSound.pitch, droneTargetPitch, 2 * Time.deltaTime);
 
 			if (isSwapOn && destinationScrambleRotation2 && destinationScrambleRotation1)
 			{
@@ -459,8 +476,18 @@ public class AlphabetaScript : MonoBehaviour
 		{
 			Application.Quit();
 		}
+	}
 
-
+	AudioSource[] ShuffleSoundArray(AudioSource[] array)
+	{
+		for (int t = 0; t < array.Length; t++)
+		{
+			AudioSource tmp = array[t];
+			int r = Random.Range(t, array.Length);
+			array[t] = array[r];
+			array[r] = tmp;
+		}
+		return array;
 	}
 
 	Vector3[] ShuffleArray(Vector3[] array)
@@ -1076,6 +1103,21 @@ public class AlphabetaScript : MonoBehaviour
 	{
 		ClearRadials();
 		pictureCanvasGroup.alpha = 0;
+		string tempSound;
+		GameObject[] collectedTicks = GameObject.FindGameObjectsWithTag("MainCamera");
+		GameObject[] collectedSwaps = GameObject.FindGameObjectsWithTag("GameController");
+
+		for (int i = 0; i < tickSounds.Length; i++)
+		{
+			tickSounds[i] = collectedTicks[i].GetComponent<AudioSource>();
+		}
+		for (int i = 0; i < swapSounds.Length; i++)
+		{
+			swapSounds[i] = collectedSwaps[i].GetComponent<AudioSource>();
+		}
+
+
+
 
 		underlineWordPositions = new List<Vector3>();
 		underlineWordPositions.Add(new Vector3(0, 0f, 0)); //off
@@ -1878,7 +1920,7 @@ public class AlphabetaScript : MonoBehaviour
 		letterChange = true;
 		letterActive = true;
 		isCoroutineRunning = false;
-
+		PlaySound();
 		if (selector < letterLimit)
 		{
 			selector++;
@@ -1886,7 +1928,18 @@ public class AlphabetaScript : MonoBehaviour
 		else
 		{
 			selector = 0;
+			//tickSounds = ShuffleSoundArray(tickSounds);
 		}
+	}
+
+	void PlaySound()
+	{
+		int tempNum = Random.Range(1, 12);
+		
+			soundCounter++;
+		
+		tickSounds[soundCounter].Play();
+		if (soundCounter == 26) soundCounter = 0;
 	}
 
 	void SwapPacer()
@@ -1920,6 +1973,14 @@ public class AlphabetaScript : MonoBehaviour
 				|| (letterToSwap2 == 0 && selector == 22) || (letterToSwap2 == 0 && selector == 23) || (letterToSwap2 == 0 && selector == 24) || (letterToSwap2 == 0 && selector == 25)
 				|| (letterToSwap2 == 1 && selector == 23) || (letterToSwap2 == 1 && selector == 24) || (letterToSwap2 == 1 && selector == 25) || (letterToSwap2 == 2 && selector == 24)
 				|| (letterToSwap2 == 2 && selector == 25));
+
+		int tempNum = Random.Range(1, 11);
+		int tempNum2 = Random.Range(1, 11);
+		tempNum -= 1;
+		tempNum2 -= 1;
+		swapSounds[tempNum].Play();
+		swapSounds[tempNum2].Play();
+
 
 
 		swapHandCounter++;
@@ -2672,6 +2733,8 @@ public class AlphabetaScript : MonoBehaviour
 		cameraBackgroundColor = cameraBackgroundColorOff;
 		clockBlurTarget = clockBlurOff;
 		targetBlackSpeed = targetBlackSpeedPause;
+		droneTargetPitch = droneLowPitch;
+		droneTargetVolume = droneHighVolume;
 		AbstractLetterEffect();
 	}
 
