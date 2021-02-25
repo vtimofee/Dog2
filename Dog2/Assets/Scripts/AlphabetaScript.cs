@@ -78,13 +78,13 @@ public class AlphabetaScript : MonoBehaviour
 	//private Color dummyRed = new Color(1, .48f, .48f, 1);
 	//private Color dummyBlue = new Color(.694f, .87f, 1f, 1);
 	private Color dummyRed = Color.red;
-	private Color dummyBlue = Color.blue;
+	private Color dummyBlue = new Color(.27f, .545f, .749f, 1);
 	private int coCounter = 0;
 	private int swapFrequency = 1;
 	private int initialTopCount = 1;
 	private int initialBottomCount = 1;
-	private int letterToSwap1 = 1;
-	private int letterToSwap2 = 15;
+	private int letterToSwap1 = 7;
+	private int letterToSwap2 = 19;
 	private bool useGeneratedText = true;
 	List<string> sentencesList = new List<string>();
 	List<string> sentencesMasterList = new List<string>();
@@ -173,8 +173,8 @@ public class AlphabetaScript : MonoBehaviour
 	public Camera clockCameraBlur;
 	private float targetIntensityClock = 0;
 	private int[] abstractArray = new int[26];
-	private float targetIntensityMax = .4f;
-	private float targetIntensityMin = .1f;
+	private float targetIntensityMax = .2f;
+	private float targetIntensityMin = 0f;
 
 	public Material clockMaterial;
 	public Material clockMaterialLines;
@@ -199,11 +199,11 @@ public class AlphabetaScript : MonoBehaviour
 	public PostProcessVolume volumeClockBlur;
 	DepthOfField depthOfFieldClockBlur;
 	private float clockBlurTarget;
-	private float clockBlurOn = 2.78f;
-	private float clockBlurOff = 6.91f;
+	private float clockBlurOn = 0f;
+	private float clockBlurOff = 60f;
 	private float targetBlackSpeed;
 	private float targetBlackSpeedPause = 3f;
-	private float targetBlackSpeedNormal = .3f;
+	private float targetBlackSpeedNormal = .1f;
 	public float underlineAlpha;
 	public GameObject underlineWord;
 	public CanvasGroup underlineWordCanvas;
@@ -230,6 +230,7 @@ public class AlphabetaScript : MonoBehaviour
 	float pictureAlpha;
 	public GameObject clockFace;
 	Vector3 clockFaceTargetScale;
+	Vector3 clockFaceStartScale;
 	Vector3 clockFaceScaleMin;
 	Vector3 clockDivide = new Vector3(.5f, .5f, .5f);
 	private bool isPictureScrambling = true;
@@ -246,15 +247,15 @@ public class AlphabetaScript : MonoBehaviour
 	bool isFinalTimeScalePaused;
 
 	// important variables to play with
-	private bool isDebugModeOn = false;
+	private bool isDebugModeOn = true;
 	private float resetLerpDuration = 1.5f;
-	private float clockTime = .4f; // .4 is a good one..also 1/3/5 is good proportion
-	private float lerpDuration = 1f; // 1 is a good one
-	private float slowLerpDuration = 3f; // 3 is a good one
+	private float clockTime = .8f; // .4 is a good one..also 1/3/5 is good proportion
+	private float lerpDuration = 2f; // 1 is a good one
+	private float slowLerpDuration = 6f; // 3 is a good one
 	private float scrambleLerpDuration = 3f;
 	private float scrambleLerpDuration2 = 4f;
 	private float punctuationDelay = 2;
-	float pictureLerpSpeed = 1f;
+	float pictureLerpSpeed = .7f;
 	private int letterLimit = 25;  // 25 is max
 	float endOfQuestionDelay = 2;
 	private bool isSwapOn = true;
@@ -277,7 +278,7 @@ public class AlphabetaScript : MonoBehaviour
 	public float droneLowPitch = .9f;
 	public float droneHighPitch = 1.2f;
 	public AudioSource questionSound;
-
+	Color dummyGreen = new Color(.28f, .75f, .137f);
 	void Start()
 	{
         for (int i = 1; i < Display.displays.Length; i++)
@@ -290,7 +291,7 @@ public class AlphabetaScript : MonoBehaviour
 		if (isDebugModeOn)
 		{
 			endOfQuestionDelay = 1;
-			durationOfInput = 1;
+			durationOfInput = 4;
 			radialDelay = 1f;
 			timescaleTimerCount = .5f;
 			punctuationDelay = .1f;
@@ -298,6 +299,7 @@ public class AlphabetaScript : MonoBehaviour
 		droneTargetPitch = droneHighPitch;
 		droneSound.volume = droneLowVolume;
 		radialTargetColor = new Color(1, 1, 1, 1);
+		clockFaceStartScale = clockFace.transform.localScale;
 		clockFaceTargetScale = clockFace.transform.localScale;
 		clockFaceScaleMin.x = clockFaceTargetScale.x * .95f;
 		clockFaceScaleMin.y = clockFaceTargetScale.x * .95f;
@@ -330,7 +332,6 @@ public class AlphabetaScript : MonoBehaviour
 		//GenerateUnderlines(24, 0,0,0);
 
 		UpdateSlaveTextAmountAndColor();
-		ScramblePicture();
 		GenerateNextSentence();
 
 		//ResetSlaveTextCount();
@@ -418,8 +419,8 @@ public class AlphabetaScript : MonoBehaviour
 		if (isResetting)
 		{
 			resetHandCanvasGroup.alpha = Mathf.Lerp(resetHandCanvasGroup.alpha, .9f, .2f * Time.deltaTime);
-			resetHandTimer += Time.unscaledDeltaTime;
-			resetHand.eulerAngles = new Vector3(0, 0, -resetHandTimer * 20f);
+			resetHandTimer += 2 * Time.unscaledDeltaTime;
+			resetHand.eulerAngles = new Vector3(0, 0, -resetHandTimer * 10f);
 			Debug.Log("resetHandTimer :" + resetHandTimer);
 			if (resetHandTimer > 36)
 			{
@@ -676,17 +677,17 @@ public class AlphabetaScript : MonoBehaviour
             {
 				if (swapCutter == 1)
 				{
-					object1.image.color = swapperBlue;
-					object2.image.color = swapperBlue;
-					target1.image.color = swapperBlue;
-					target2.image.color = swapperBlue;
+					object1.image.color = dummyBlue;
+					object2.image.color = dummyBlue;
+					target1.image.color = dummyBlue;
+					target2.image.color = dummyBlue;
 				}
 				else
 				{
-					object1.image.color = Color.green;
-					object2.image.color = Color.green;
-					target1.image.color = Color.green;
-					target2.image.color = Color.green;
+					object1.image.color = dummyGreen;
+					object2.image.color = dummyGreen;
+					target1.image.color = dummyGreen;
+					target2.image.color = dummyGreen;
 				}
 			}
 	
@@ -1330,7 +1331,6 @@ public class AlphabetaScript : MonoBehaviour
 			case 2:
 				break;
 
-
 			case 3:
 				underlineWord.transform.position = underlineWordPositions[1];
 				textCameraBlank.transform.localPosition = textCameraPositions[3];
@@ -1457,6 +1457,7 @@ public class AlphabetaScript : MonoBehaviour
 				textCamera.transform.localPosition = textCameraPositions[2];
 				radialObject1.transform.position = radialPositions[1];
 				pictureAlpha = 0f;
+				isPictureScrambling = true;
 				break;
 
 			case 22:
@@ -2013,6 +2014,8 @@ public class AlphabetaScript : MonoBehaviour
 	{
 		InvokeRepeating("Pacer", 1, clockTime);
 		if (isSwapOn) InvokeRepeating("SwapPacer", 1, slowLerpDuration);
+		InvokeRepeating("ScramblePicture", 1,(pictureLerpSpeed + .2f));
+
 		//InvokeRepeating("ScramblePacer", 1, scrambleLerpDuration - .5f);
 	}
 
@@ -2034,6 +2037,7 @@ public class AlphabetaScript : MonoBehaviour
 
 
 	}
+	
 
 	void LetterEvolve(int i)
 	{
@@ -2046,14 +2050,14 @@ public class AlphabetaScript : MonoBehaviour
 			targetIntensityClock = targetIntensityMax;
 			clockMaterial.color = clockTargetColor;
 			clockMaterialLines.color = clockTargetColor;
-			clockFace.transform.localScale = clockFaceTargetScale;
+			//clockFace.transform.localScale = clockFaceTargetScale;
 		}
 		else if (i == 8 || i == 20)
         {
 			targetIntensityClock = targetIntensityMax;
 			clockMaterial.color = clockTargetColor;
 			clockMaterialLines.color = clockTargetColor;
-			clockFace.transform.localScale = clockFaceTargetScale;
+			//clockFace.transform.localScale = clockFaceTargetScale;
 		}
 		else
         {
@@ -2221,7 +2225,7 @@ public class AlphabetaScript : MonoBehaviour
 			yield return null;
 		}
 		Debug.Log("isPictureScrabling : " + isPictureScrambling);
-		if (!reset)ScramblePicture();
+		//if (!reset)ScramblePicture();
 	}
 
 
@@ -2486,10 +2490,10 @@ public class AlphabetaScript : MonoBehaviour
 							}
 							else
 							{
-								i.GetComponent<Image>().color = Color.green;
-								j.GetComponent<Image>().color = Color.green;
-								k.GetComponent<Image>().color = Color.green;
-								l.GetComponent<Image>().color = Color.green;
+								i.GetComponent<Image>().color = dummyGreen;
+								j.GetComponent<Image>().color = dummyGreen;
+								k.GetComponent<Image>().color = dummyGreen;
+								l.GetComponent<Image>().color = dummyGreen;
 							}
 						}
 					}
@@ -2691,10 +2695,10 @@ public class AlphabetaScript : MonoBehaviour
 		DeleteGeneratedText();
 		isFinalTimeScalePaused = true;
 		timescaleTarget = .2f;
-		targetIntensityClock = targetIntensityMin;
+		targetIntensityClock = 0;
 		clockMaterial.color = clockTargetColor;
 		clockMaterialLines.color = clockTargetColor;
-		clockFace.transform.localScale = clockFaceTargetScale;
+		clockFace.transform.localScale = clockFaceStartScale;
 		clockHandScale = clockHandScaleNormal;
 	}
 
@@ -2713,12 +2717,14 @@ public class AlphabetaScript : MonoBehaviour
 		StartCoroutine(ResetPositionsAndRotations());
 		targetBlackSpeed = targetBlackSpeedPause;
 		StartCoroutine(ResetPositionsAndRotations());
+		clockFace.transform.localScale = clockFaceStartScale;
 		Invoke("Restart", 20);
 	}
 
 
 	void Restart()
     {
+		clockFace.transform.localScale = clockFaceStartScale;
 		Time.timeScale = 1;
 		Resources.UnloadUnusedAssets();
 		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single); start = true;
@@ -2898,11 +2904,8 @@ public class AlphabetaScript : MonoBehaviour
 						inputRadials[3].fillAmount += 1f / radialDelay * Time.deltaTime;
 					}
 					else
-					{	if (currentSentenceCounter == 22)
-						{
-							isPictureScrambling = false;
-						}
-						
+					{
+						isPictureScrambling = false;
 						isRadialFilled = true;
 						doRadialFill = false;
 						CancelInvoke("RadialBlinker");

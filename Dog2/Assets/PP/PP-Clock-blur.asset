@@ -50,7 +50,7 @@ MonoBehaviour:
     value: 3.7
   focalLength:
     overrideState: 1
-    value: 46
+    value: 68
   kernelSize:
     overrideState: 0
     value: 1

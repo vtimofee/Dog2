@@ -69,6 +69,7 @@ public class CameraScript : MonoBehaviour
     float returnCameraDuration = 5;
     float cameraRotateSpeed = 1;
     float timeRemaining = 5;
+    bool isSlowDownDolls;
     // Start is called before the first frame update
     void Start()
     {
@@ -259,6 +260,13 @@ public class CameraScript : MonoBehaviour
         spotlightTargetIntensity = spotlightStartingIntensity;
         blurTarget = dofBlurOff;
         StartCoroutine(MoveObject(cameraMid.gameObject, cameraMidStartingPosition));
+        Invoke("SlowDownDolls", 20);
+    }
+
+    void SlowDownDolls()
+    {
+        doll1TargetSpeed = 0;
+        doll2TargetSpeed = 0;
     }
 
 
