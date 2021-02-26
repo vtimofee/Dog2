@@ -179,7 +179,7 @@ public class AlphabetaScript : MonoBehaviour
 	public Material clockMaterial;
 	public Material clockMaterialLines;
 	private Color clockTargetColor = new Color(1, 1, 1, .9f);
-	private Color clockTransparentColor = new Color(1, 1, 1, .1f);
+	private Color clockTransparentColor = new Color(1, 1, 1, .3f);
 	private Color underlineTargetColor = new Color(1, 1, 1, 1f);
 	private Color underlineTransparentColor = new Color(1, 1, 1, 0f);
 	private int swapHandCounter;
@@ -247,7 +247,7 @@ public class AlphabetaScript : MonoBehaviour
 	bool isFinalTimeScalePaused;
 
 	// important variables to play with
-	private bool isDebugModeOn = true;
+	private bool isDebugModeOn = false;
 	private float resetLerpDuration = 1.5f;
 	private float clockTime = .8f; // .4 is a good one..also 1/3/5 is good proportion
 	private float lerpDuration = 2f; // 1 is a good one
@@ -393,7 +393,8 @@ public class AlphabetaScript : MonoBehaviour
 			clockHand.transform.rotation = Quaternion.Lerp(clockHand.transform.rotation, destinationRotation.rotation, 5f * Time.deltaTime);
 			questionHand.transform.rotation = Quaternion.Lerp(questionHand.transform.rotation, questionDestinationRotation.rotation, 1f * Time.deltaTime);
 			glow.Intensity = Mathf.Lerp(glow.Intensity, targetIntensityClock, 2 * Time.deltaTime);
-			clockMaterial.color = Color.Lerp(clockMaterial.color, clockTransparentColor, .2f * Time.deltaTime);
+			clockMaterial.color = Color.Lerp(clockMaterial.color, clockTransparentColor, 1f * Time.deltaTime);
+			clockMaterialLines.color = Color.Lerp(clockMaterialLines.color, clockTransparentColor, 2f * Time.deltaTime);
 			clockCameraBlur.backgroundColor = Color.Lerp(clockCameraBlur.backgroundColor, cameraBackgroundColor, 5 * Time.unscaledDeltaTime);
 			depthOfFieldClockBlur.focalLength.value = Mathf.Lerp(depthOfFieldClockBlur.focalLength.value, clockBlurTarget, 3 * Time.deltaTime);
 			pictureCanvasGroup.alpha = Mathf.Lerp(pictureCanvasGroup.alpha, pictureAlpha, 3 * Time.deltaTime);
@@ -2042,22 +2043,24 @@ public class AlphabetaScript : MonoBehaviour
 	void LetterEvolve(int i)
 	{
 		var tempColor = clockMaterial.color;
-		tempColor.a -= .05f;
+		//tempColor.a -= .05f;
+		tempColor.a = .5f;
 		clockMaterial.color = tempColor;
 		clockMaterialLines.color = tempColor;
+		
 		if (i == 14 || i == 1)
         {
 			targetIntensityClock = targetIntensityMax;
-			clockMaterial.color = clockTargetColor;
-			clockMaterialLines.color = clockTargetColor;
-			//clockFace.transform.localScale = clockFaceTargetScale;
+			//clockMaterial.color = clockTargetColor;
+			//clockMaterialLines.color = clockTargetColor;
+			clockFace.transform.localScale = clockFaceTargetScale;
 		}
 		else if (i == 8 || i == 20)
         {
 			targetIntensityClock = targetIntensityMax;
-			clockMaterial.color = clockTargetColor;
-			clockMaterialLines.color = clockTargetColor;
-			//clockFace.transform.localScale = clockFaceTargetScale;
+			//clockMaterial.color = clockTargetColor;
+			//clockMaterialLines.color = clockTargetColor;
+			clockFace.transform.localScale = clockFaceTargetScale;
 		}
 		else
         {
