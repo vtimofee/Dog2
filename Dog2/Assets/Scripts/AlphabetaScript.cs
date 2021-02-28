@@ -189,7 +189,7 @@ public class AlphabetaScript : MonoBehaviour
 	private float timescaleTimerCount = 4f;
 	public int questionCounter;
 	private int questionCycleCounter = 1;
-
+	private int cycleCounter;
 	private float finalTimescaleTimerCount = 5;
 	private float finalTimeScaleSpeed = 3;
 	private bool isTimescalePaused;
@@ -267,20 +267,28 @@ public class AlphabetaScript : MonoBehaviour
 	float startScrambleLerpDuration2 = 3f;
 	bool isResetting;
 	public AudioSource tic;
-	public AudioSource[] tickSounds = new AudioSource[30];
-	public AudioSource[] swapSounds = new AudioSource[10];
-	int soundCounter;
+	public AudioSource[] tick2Sounds = new AudioSource[10];
+	public AudioSource[] swapSounds = new AudioSource[5];
+	public AudioSource[] swap2Sounds = new AudioSource[5];
+
+	public AudioSource tickSound;
+	public AudioSource swapSound;
+	private int swapCounter;
+
+	int tickCounter;
 	public AudioSource droneSound;
 	public float droneTargetVolume;
-	public float droneLowVolume = .1f;
-	public float droneHighVolume = .4f;
+	public float droneLowVolume = 0f;
+	public float droneHighVolume = .1f;
 	public float droneTargetPitch;
-	public float droneLowPitch = .9f;
-	public float droneHighPitch = 1.2f;
+	public float droneLowPitch = .5f;
+	public float droneHighPitch = .6f;
 	public AudioSource questionSound;
+	float clockHandSpeed = 5;
 	Color dummyGreen = new Color(.28f, .75f, .137f);
 	void Start()
 	{
+		droneHighVolume = droneSound.volume;
         for (int i = 1; i < Display.displays.Length; i++)
         {
             Display.displays[i].Activate();
@@ -296,8 +304,8 @@ public class AlphabetaScript : MonoBehaviour
 			timescaleTimerCount = .5f;
 			punctuationDelay = .1f;
 		}
-		droneTargetPitch = droneHighPitch;
-		droneSound.volume = droneLowVolume;
+		//droneTargetPitch = droneHighPitch;
+		//droneSound.volume = 0;
 		radialTargetColor = new Color(1, 1, 1, 1);
 		clockFaceStartScale = clockFace.transform.localScale;
 		clockFaceTargetScale = clockFace.transform.localScale;
@@ -355,20 +363,21 @@ public class AlphabetaScript : MonoBehaviour
 
 		if (start)
 		{
-			if (isTimescalePaused)
+			if (isTimescalePaused) // if the Abstract Letter is triggered and time slows down..
             {
+				droneSound.volume = droneHighVolume;
 				AbstractLetterEffect();
 				timescaleTimerCount -= Time.unscaledDeltaTime;
-				if(timescaleTimerCount <= 0)
+				if(timescaleTimerCount <= 0) // when the time - pause ends
                 {
-					droneTargetPitch = droneHighPitch;
-					droneTargetVolume = droneLowVolume;
+					//droneTargetVolume = droneLowVolume;
 					timescaleTarget = 1f;
 					cameraBackgroundColor = cameraBackgroundColorOn;
 					isTimescalePaused = false;
 					timescaleTimerCount = 1;
 					clockBlurTarget = clockBlurOn;
 					targetBlackSpeed = targetBlackSpeedNormal;
+					//droneSound.Stop();
 					if (letterReplacementCount <= letterLimit) letterReplacementCount++;
 				}
 			}
@@ -378,7 +387,7 @@ public class AlphabetaScript : MonoBehaviour
 			{
 				LetterEvolve(selector);
 				letterActive = false;
-				Swapper(letterToSwap2, letterToSwap1);
+				if (isSwapOn)Swapper(letterToSwap2, letterToSwap1);
 			}
 			if (!isTimescalePaused)TurnSelectorRed(selector);
 
@@ -390,7 +399,7 @@ public class AlphabetaScript : MonoBehaviour
 			}
 
 			Time.timeScale = Mathf.Lerp(Time.timeScale, timescaleTarget, timescaleTargetSpeed * Time.deltaTime);
-			clockHand.transform.rotation = Quaternion.Lerp(clockHand.transform.rotation, destinationRotation.rotation, 5f * Time.deltaTime);
+			clockHand.transform.rotation = Quaternion.Lerp(clockHand.transform.rotation, destinationRotation.rotation, clockHandSpeed * Time.deltaTime);
 			questionHand.transform.rotation = Quaternion.Lerp(questionHand.transform.rotation, questionDestinationRotation.rotation, 1f * Time.deltaTime);
 			glow.Intensity = Mathf.Lerp(glow.Intensity, targetIntensityClock, 2 * Time.deltaTime);
 			clockMaterial.color = Color.Lerp(clockMaterial.color, clockTransparentColor, 1f * Time.deltaTime);
@@ -400,8 +409,8 @@ public class AlphabetaScript : MonoBehaviour
 			pictureCanvasGroup.alpha = Mathf.Lerp(pictureCanvasGroup.alpha, pictureAlpha, 3 * Time.deltaTime);
 			glow.Intensity = Mathf.Lerp(glow.Intensity, targetIntensityClock, 2 * Time.deltaTime);
 			clockFace.transform.localScale = Vector3.Lerp(clockFace.transform.localScale, clockFaceScaleMin, .2f * Time.deltaTime);
-			droneSound.volume = Mathf.Lerp(droneSound.volume, droneTargetVolume, 2 * Time.deltaTime);
-			droneSound.pitch = Mathf.Lerp(droneSound.pitch, droneTargetPitch, 2 * Time.deltaTime);
+			droneSound.volume = Mathf.Lerp(droneSound.volume, 0, 2 * Time.deltaTime);
+			//droneSound.pitch = Mathf.Lerp(droneSound.pitch, droneTargetPitch, 2 * Time.deltaTime);
 
 			if (isSwapOn && destinationScrambleRotation2 && destinationScrambleRotation1)
 			{
@@ -433,8 +442,8 @@ public class AlphabetaScript : MonoBehaviour
 			clockHandScrambler1.transform.rotation = Quaternion.Lerp(clockHandScrambler1.transform.rotation, destinationRotation.rotation, 2f * Time.unscaledDeltaTime);
 			clockHandScrambler2.transform.rotation = Quaternion.Lerp(clockHandScrambler2.transform.rotation, destinationRotation.rotation, 2f * Time.unscaledDeltaTime);
 			questionHand.transform.rotation = Quaternion.Lerp(questionHand.transform.rotation, destinationRotation.rotation, 2f * Time.unscaledDeltaTime);
-			droneSound.volume = Mathf.Lerp(droneSound.volume, droneTargetVolume, 1 * Time.deltaTime);
-			droneSound.pitch = Mathf.Lerp(droneSound.pitch, droneTargetPitch, 1 * Time.deltaTime);
+			//droneSound.volume = Mathf.Lerp(droneSound.volume, droneTargetVolume, 1 * Time.deltaTime);
+			//droneSound.pitch = Mathf.Lerp(droneSound.pitch, droneTargetPitch, 1 * Time.deltaTime);
 		}
 
 		
@@ -938,8 +947,32 @@ public class AlphabetaScript : MonoBehaviour
 
 	void Swapper(int letterToSwap2, int letterToSwap1)
 	{
+
+
 		if (!swap)
 		{
+			/*			int tempNum = Random.Range(1, 11);
+						int tempNum2 = Random.Range(1, 11);
+						tempNum -= 1;
+						tempNum2 -= 1;
+						swapSounds[tempNum].Play();
+						swapSounds[tempNum2].Play();*/
+			//swapSounds[letterToSwap2].Play();
+			//swapSounds[letterToSwap1].Play();
+			swapSounds[swapCounter].Play();
+			swap2Sounds[swapCounter].Play();
+
+
+			swapCounter++;
+			if (swapCounter > 4)
+			{
+				swapCounter = 0;
+				swapSounds = ShuffleSoundArray(swapSounds);
+				swap2Sounds = ShuffleSoundArray(swap2Sounds);
+			}
+
+
+			//swapSound.Play();
 			swap = true;
 			SlaveTextSwapper(letterToSwap2, letterToSwap1, swapCutter);
 			switch (swapCutter)
@@ -1109,25 +1142,18 @@ public class AlphabetaScript : MonoBehaviour
 		ClearRadials();
 		pictureCanvasGroup.alpha = 0;
 		string tempSound;
-		GameObject[] collectedTicks = GameObject.FindGameObjectsWithTag("MainCamera");
-		collectedTicks = collectedTicks.OrderBy(i => i.name).ToArray();
 
-		GameObject[] collectedSwaps = GameObject.FindGameObjectsWithTag("GameController");
+/*		GameObject[] collectedSwaps = GameObject.FindGameObjectsWithTag("GameController");
 		collectedSwaps = collectedSwaps.OrderBy(i => i.name).ToArray();
-
-		for (int i = 0; i < tickSounds.Length; i++)
-		{
-			tickSounds[i] = collectedTicks[i].GetComponent<AudioSource>();
-		}
-		for (int i = 0; i < swapSounds.Length; i++)
-		{
-			swapSounds[i] = collectedSwaps[i].GetComponent<AudioSource>();
-		}
+        for (int i = 0; i < swapSounds.Length; i++)
+        {
+            swapSounds[i] = collectedSwaps[i].GetComponent<AudioSource>();
+        }*/
 
 
 
 
-		underlineWordPositions = new List<Vector3>();
+        underlineWordPositions = new List<Vector3>();
 		underlineWordPositions.Add(new Vector3(0, 0f, 0)); //off
 		underlineWordPositions.Add(new Vector3(4025, -516.5f, -182)); // sentence 4
 		underlineWordPositions.Add(new Vector3(4570, -585.5f, -143)); // sentence 9
@@ -1936,19 +1962,23 @@ public class AlphabetaScript : MonoBehaviour
 		else
 		{
 			selector = 0;
+			cycleCounter++;
+			if (!isSwapOn)
+				isSwapOn = true;
 			//tickSounds = ShuffleSoundArray(tickSounds);
 		}
 	}
 
 	void PlaySound()
 	{
-		int tempNum = Random.Range(1, 12);
-		
-			soundCounter++;
-		
-		tickSounds[soundCounter].Play();
-		if (soundCounter == 26) soundCounter = 0;
-	}
+		tickSound.Play();
+		Debug.Log("Play Sound" + tickCounter);
+        //tickSounds[1].Play();
+
+        tickCounter++;
+        tick2Sounds[tickCounter].Play();
+        if (tickCounter == 9) tickCounter = 0;
+    }
 
 	void SwapPacer()
 	{
@@ -1982,16 +2012,10 @@ public class AlphabetaScript : MonoBehaviour
 				|| (letterToSwap2 == 1 && selector == 23) || (letterToSwap2 == 1 && selector == 24) || (letterToSwap2 == 1 && selector == 25) || (letterToSwap2 == 2 && selector == 24)
 				|| (letterToSwap2 == 2 && selector == 25));
 
-		int tempNum = Random.Range(1, 11);
-		int tempNum2 = Random.Range(1, 11);
-		tempNum -= 1;
-		tempNum2 -= 1;
-		swapSounds[tempNum].Play();
-		swapSounds[tempNum2].Play();
 
 
 
-		swapHandCounter++;
+        swapHandCounter++;
 		if (swapHandCounter == 1)
         {
 			Debug.Log("1");
@@ -2023,10 +2047,11 @@ public class AlphabetaScript : MonoBehaviour
 	void SpeedUpPacer()
     {
 
-		clockTime /= 1.05f;
-		slowLerpDuration /= 1.05f;
-		lerpDuration /= 1.05f;
-		targetBlackSpeed *= 1.5f;
+		clockTime /= 1.08f;
+		slowLerpDuration /= 1.08f;
+		lerpDuration /= 1.04f;
+		targetBlackSpeed *= 1.4f;
+		clockHandSpeed *= 1.08f;
 		CancelInvoke("Pacer");
 		InvokeRepeating("Pacer", 0, clockTime);
 		if (isSwapOn)
@@ -2707,8 +2732,8 @@ public class AlphabetaScript : MonoBehaviour
 
     void ResetValues()
     {
-		droneTargetPitch = .8f;
-		droneTargetVolume = .5f;
+	//	droneTargetPitch = .8f;
+		//droneTargetVolume = .5f;
 		start = false;
 		isFinalTimeScalePaused = false;
 		finalTimescaleTimerCount = 10;
@@ -2742,7 +2767,6 @@ public class AlphabetaScript : MonoBehaviour
 
 	void AbstractLetterTrigger()
     {
-		
 		Debug.Log("triggered Abstract ");
 		if (isTimescalePaused) return;
 		isTimescalePaused = true;
@@ -2750,9 +2774,9 @@ public class AlphabetaScript : MonoBehaviour
 		cameraBackgroundColor = cameraBackgroundColorOff;
 		clockBlurTarget = clockBlurOff;
 		targetBlackSpeed = targetBlackSpeedPause;
-		droneTargetPitch = droneLowPitch;
-		droneTargetVolume = droneHighVolume;
-		AbstractLetterEffect();
+		// droneTargetPitch = droneLowPitch;
+		droneSound.Play();
+        AbstractLetterEffect();
 	}
 
 	void AbstractLetterEffect()
