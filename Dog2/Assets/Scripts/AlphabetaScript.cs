@@ -179,6 +179,7 @@ public class AlphabetaScript : MonoBehaviour
 	public Material clockMaterial;
 	public Material clockMaterialLines;
 	private Color clockTargetColor = new Color(1, 1, 1, .9f);
+	private Color clockStartColor = new Color(1, 1, 1, .9f);
 	private Color clockTransparentColor = new Color(1, 1, 1, .3f);
 	private Color underlineTargetColor = new Color(1, 1, 1, 1f);
 	private Color underlineTransparentColor = new Color(1, 1, 1, 0f);
@@ -191,7 +192,7 @@ public class AlphabetaScript : MonoBehaviour
 	private int questionCycleCounter = 1;
 	private int cycleCounter;
 	private float finalTimescaleTimerCount = 5;
-	private float finalTimeScaleSpeed = 3;
+	private float finalTimeScaleSpeed = 1;
 	private bool isTimescalePaused;
 	private Color cameraBackgroundColor;
 	private Color cameraBackgroundColorOn = new Color(.83f, .83f, .83f, 0);
@@ -274,7 +275,6 @@ public class AlphabetaScript : MonoBehaviour
 	public AudioSource tickSound;
 	public AudioSource swapSound;
 	private int swapCounter;
-
 	int tickCounter;
 	public AudioSource droneSound;
 	public float droneTargetVolume;
@@ -286,6 +286,14 @@ public class AlphabetaScript : MonoBehaviour
 	public AudioSource questionSound;
 	float clockHandSpeed = 5;
 	Color dummyGreen = new Color(.28f, .75f, .137f);
+	float clockMaterialSpeed = 2;
+	public AudioSource resetSound;
+	public AudioSource chimeSound;
+	public AudioSource startSound;
+	public AudioSource endSound;
+	float clockFaceScaleSpeed = .2f;
+	float pacerDelay;
+	public AudioSource quarterSound;
 	void Start()
 	{
 		droneHighVolume = droneSound.volume;
@@ -294,14 +302,14 @@ public class AlphabetaScript : MonoBehaviour
             Display.displays[i].Activate();
         }
 
-		clockBlurTarget = clockBlurOff;
+	//	clockBlurTarget = clockBlurOff;
 
 		if (isDebugModeOn)
 		{
 			endOfQuestionDelay = 1;
 			durationOfInput = 4;
 			radialDelay = 1f;
-			timescaleTimerCount = .5f;
+			timescaleTimerCount = 2f;
 			punctuationDelay = .1f;
 		}
 		//droneTargetPitch = droneHighPitch;
@@ -387,7 +395,8 @@ public class AlphabetaScript : MonoBehaviour
 			{
 				LetterEvolve(selector);
 				letterActive = false;
-				if (isSwapOn)Swapper(letterToSwap2, letterToSwap1);
+				//if (isSwapOn)
+					Swapper(letterToSwap2, letterToSwap1);
 			}
 			if (!isTimescalePaused)TurnSelectorRed(selector);
 
@@ -402,17 +411,17 @@ public class AlphabetaScript : MonoBehaviour
 			clockHand.transform.rotation = Quaternion.Lerp(clockHand.transform.rotation, destinationRotation.rotation, clockHandSpeed * Time.deltaTime);
 			questionHand.transform.rotation = Quaternion.Lerp(questionHand.transform.rotation, questionDestinationRotation.rotation, 1f * Time.deltaTime);
 			glow.Intensity = Mathf.Lerp(glow.Intensity, targetIntensityClock, 2 * Time.deltaTime);
-			clockMaterial.color = Color.Lerp(clockMaterial.color, clockTransparentColor, 1f * Time.deltaTime);
+			clockMaterial.color = Color.Lerp(clockMaterial.color, clockTransparentColor, clockMaterialSpeed * Time.deltaTime);
 			clockMaterialLines.color = Color.Lerp(clockMaterialLines.color, clockTransparentColor, 2f * Time.deltaTime);
 			clockCameraBlur.backgroundColor = Color.Lerp(clockCameraBlur.backgroundColor, cameraBackgroundColor, 5 * Time.unscaledDeltaTime);
 			depthOfFieldClockBlur.focalLength.value = Mathf.Lerp(depthOfFieldClockBlur.focalLength.value, clockBlurTarget, 3 * Time.deltaTime);
 			pictureCanvasGroup.alpha = Mathf.Lerp(pictureCanvasGroup.alpha, pictureAlpha, 3 * Time.deltaTime);
 			glow.Intensity = Mathf.Lerp(glow.Intensity, targetIntensityClock, 2 * Time.deltaTime);
-			clockFace.transform.localScale = Vector3.Lerp(clockFace.transform.localScale, clockFaceScaleMin, .2f * Time.deltaTime);
+			clockFace.transform.localScale = Vector3.Lerp(clockFace.transform.localScale, clockFaceScaleMin, clockFaceScaleSpeed * Time.deltaTime);
 			droneSound.volume = Mathf.Lerp(droneSound.volume, 0, 2 * Time.deltaTime);
 			//droneSound.pitch = Mathf.Lerp(droneSound.pitch, droneTargetPitch, 2 * Time.deltaTime);
 
-			if (isSwapOn && destinationScrambleRotation2 && destinationScrambleRotation1)
+			if (isSwapOn && destinationScrambleRotation2 && destinationScrambleRotation1 && !isResetting)
 			{
 				clockHandScrambler1.transform.rotation = Quaternion.Lerp(clockHandScrambler1.transform.rotation, destinationScrambleRotation1.rotation, clockScrambleSpeed * Time.deltaTime);
 				clockHandScrambler2.transform.rotation = Quaternion.Lerp(clockHandScrambler2.transform.rotation, destinationScrambleRotation2.rotation, clockScrambleSpeed * Time.deltaTime);
@@ -423,6 +432,8 @@ public class AlphabetaScript : MonoBehaviour
 		{
 			glow.Intensity = Mathf.Lerp(glow.Intensity, targetIntensityClock, 2 * Time.unscaledDeltaTime);
 			Time.timeScale = Mathf.Lerp(Time.timeScale, timescaleTarget, finalTimeScaleSpeed * Time.unscaledDeltaTime);
+			clockHandSpeed = Mathf.Lerp(clockHandSpeed, 0, 1 * Time.unscaledDeltaTime);
+			clockTime = Mathf.Lerp(clockTime, 0, 1 * Time.unscaledDeltaTime);
 		}
 
 
@@ -434,19 +445,21 @@ public class AlphabetaScript : MonoBehaviour
 			Debug.Log("resetHandTimer :" + resetHandTimer);
 			if (resetHandTimer > 36)
 			{
-				isPaused = false;
-				resetHand.eulerAngles = new Vector3(0, 0, 0);
-				Invoke("Restart", 1);
+				PrepareForRestart();
 			}
-			clockHand.transform.rotation = Quaternion.Lerp(clockHand.transform.rotation, destinationRotation.rotation, 2f * Time.unscaledDeltaTime);
-			clockHandScrambler1.transform.rotation = Quaternion.Lerp(clockHandScrambler1.transform.rotation, destinationRotation.rotation, 2f * Time.unscaledDeltaTime);
-			clockHandScrambler2.transform.rotation = Quaternion.Lerp(clockHandScrambler2.transform.rotation, destinationRotation.rotation, 2f * Time.unscaledDeltaTime);
-			questionHand.transform.rotation = Quaternion.Lerp(questionHand.transform.rotation, destinationRotation.rotation, 2f * Time.unscaledDeltaTime);
+			clockHand.transform.rotation = Quaternion.Lerp(clockHand.transform.rotation, questionHandRotations[0].rotation, 2f * Time.unscaledDeltaTime);
+			clockHandScrambler1.transform.rotation = Quaternion.Lerp(clockHandScrambler1.transform.rotation, questionHandRotations[0].rotation, 2f * Time.unscaledDeltaTime);
+			clockHandScrambler2.transform.rotation = Quaternion.Lerp(clockHandScrambler2.transform.rotation, questionHandRotations[0].rotation, 2f * Time.unscaledDeltaTime);
+			questionHand.transform.rotation = Quaternion.Lerp(questionHand.transform.rotation, questionHandRotations[0].rotation, 2f * Time.unscaledDeltaTime);
+			clockHand.transform.localScale = Vector3.Lerp(clockHand.transform.localScale, clockHandScaleNormal, clockHandSizeSpeed * Time.deltaTime);
+			clockFace.transform.localScale = Vector3.Lerp(clockFace.transform.localScale, clockFaceStartScale, 3 * Time.deltaTime);
+
+
 			//droneSound.volume = Mathf.Lerp(droneSound.volume, droneTargetVolume, 1 * Time.deltaTime);
 			//droneSound.pitch = Mathf.Lerp(droneSound.pitch, droneTargetPitch, 1 * Time.deltaTime);
 		}
 
-		
+
 
 		if (Input.GetKeyDown("3"))
 		{
@@ -950,27 +963,17 @@ public class AlphabetaScript : MonoBehaviour
 
 
 		if (!swap)
-		{
-			/*			int tempNum = Random.Range(1, 11);
-						int tempNum2 = Random.Range(1, 11);
-						tempNum -= 1;
-						tempNum2 -= 1;
-						swapSounds[tempNum].Play();
-						swapSounds[tempNum2].Play();*/
-			//swapSounds[letterToSwap2].Play();
-			//swapSounds[letterToSwap1].Play();
-			swapSounds[swapCounter].Play();
-			swap2Sounds[swapCounter].Play();
-
-
-			swapCounter++;
-			if (swapCounter > 4)
+		{;
+			if (!isTimescalePaused)
 			{
-				swapCounter = 0;
-				swapSounds = ShuffleSoundArray(swapSounds);
-				swap2Sounds = ShuffleSoundArray(swap2Sounds);
+				swapSounds[swapCounter].Play();
+				swap2Sounds[swapCounter].Play();
+				swapCounter++;
+				if (swapCounter > 3)
+				{
+					swapCounter = 0;
+				}
 			}
-
 
 			//swapSound.Play();
 			swap = true;
@@ -1954,7 +1957,7 @@ public class AlphabetaScript : MonoBehaviour
 		letterChange = true;
 		letterActive = true;
 		isCoroutineRunning = false;
-		PlaySound();
+		if (!isTimescalePaused) PlaySound();
 		if (selector < letterLimit)
 		{
 			selector++;
@@ -2051,7 +2054,9 @@ public class AlphabetaScript : MonoBehaviour
 		slowLerpDuration /= 1.08f;
 		lerpDuration /= 1.04f;
 		targetBlackSpeed *= 1.4f;
-		clockHandSpeed *= 1.08f;
+		clockHandSpeed *= 1.05f;
+		clockMaterialSpeed *= 1.08f;
+		clockFaceScaleSpeed *= 1.08f;
 		CancelInvoke("Pacer");
 		InvokeRepeating("Pacer", 0, clockTime);
 		if (isSwapOn)
@@ -2075,6 +2080,7 @@ public class AlphabetaScript : MonoBehaviour
 		
 		if (i == 14 || i == 1)
         {
+			if (!isTimescalePaused)quarterSound.Play();
 			targetIntensityClock = targetIntensityMax;
 			//clockMaterial.color = clockTargetColor;
 			//clockMaterialLines.color = clockTargetColor;
@@ -2082,6 +2088,7 @@ public class AlphabetaScript : MonoBehaviour
 		}
 		else if (i == 8 || i == 20)
         {
+			if (!isTimescalePaused) quarterSound.Play();
 			targetIntensityClock = targetIntensityMax;
 			//clockMaterial.color = clockTargetColor;
 			//clockMaterialLines.color = clockTargetColor;
@@ -2711,27 +2718,41 @@ public class AlphabetaScript : MonoBehaviour
 	}
 
 	void End()
-    {
+	{
+		isPaused = true;
 		targetIntensityClock = targetIntensityMin;
 		underlineAlpha = 0;
 		cameraScript.isDialogueStarted = false;
 		cameraScript.StartEnd();
-		isPaused = true;
 		isTextGenerated = false;
-		CancelInvoke("Pacer");
-		CancelInvoke("SwapPacer");
+		//CancelInvoke("Pacer");
+		//CancelInvoke("Pacer");
+		pacerDelay = clockTime;
+		//SlowDownPacer();
 		DeleteGeneratedText();
 		isFinalTimeScalePaused = true;
 		timescaleTarget = .2f;
 		targetIntensityClock = 0;
-		clockMaterial.color = clockTargetColor;
-		clockMaterialLines.color = clockTargetColor;
+		clockMaterial.color = clockStartColor;
+		clockMaterialLines.color = clockStartColor;
 		clockFace.transform.localScale = clockFaceStartScale;
 		clockHandScale = clockHandScaleNormal;
 	}
 
+	void SlowDownPacer()
+    {
+		pacerDelay *= 4f;
+		Invoke("Pacer", pacerDelay);
+		if (!isResetting)Invoke("SlowDownPacer", .5f);
+    }
+
     void ResetValues()
     {
+		CancelInvoke("Pacer");
+		CancelInvoke("SwapPacer");
+		isResetting = true;
+		questionDestinationRotation = questionHandRotations[0];
+		chimeSound.Play();
 	//	droneTargetPitch = .8f;
 		//droneTargetVolume = .5f;
 		start = false;
@@ -2740,24 +2761,47 @@ public class AlphabetaScript : MonoBehaviour
 		Time.timeScale = 1;
 		timescaleTarget = 1;
 		Debug.Log("in 5 seconds");
-		isResetting = true;
 		destinationRotation = clockHandRotations[0];
 		StartCoroutine(ResetPositionsAndRotations());
 		targetBlackSpeed = targetBlackSpeedPause;
 		StartCoroutine(ResetPositionsAndRotations());
 		clockFace.transform.localScale = clockFaceStartScale;
-		Invoke("Restart", 20);
+		resetSound.Play();
+		Invoke("PrepareForRestart", 20);
+		targetIntensityClock = 0;
+	/*	clockMaterial.color = clockStartColor;
+		clockMaterialLines.color = clockStartColor;
+		clockFace.transform.localScale = clockFaceStartScale;
+		clockHandScale = clockHandScaleNormal;*/
+	}
+
+	void PrepareForRestart()
+    {
+		if (!endSound.isPlaying) endSound.Play();
+
+		//isPaused = false;
+		resetHand.eulerAngles = new Vector3(0, 0, 0);
+		resetSound.Stop();
+		//startSound.Play();
+		targetIntensityClock = 0;
+		clockMaterial.color = clockStartColor;
+		clockMaterialLines.color = clockStartColor;
+		clockFace.transform.localScale = clockFaceStartScale;
+		clockHandScale = clockHandScaleNormal;
+
+		Invoke("Restart", 1.5f);
 	}
 
 
 	void Restart()
     {
 		clockFace.transform.localScale = clockFaceStartScale;
+
 		Time.timeScale = 1;
+		isPaused = false;
+		//StartPacers();
 		Resources.UnloadUnusedAssets();
 		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single); start = true;
-		isPaused = false;
-		StartPacers();
 	}
 
 	void StartLetters()
