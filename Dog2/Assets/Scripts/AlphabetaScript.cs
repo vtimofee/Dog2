@@ -283,7 +283,6 @@ public class AlphabetaScript : MonoBehaviour
 	public float droneTargetPitch;
 	public float droneLowPitch = .5f;
 	public float droneHighPitch = .6f;
-	public AudioSource questionSound;
 	float clockHandSpeed = 5;
 	Color dummyGreen = new Color(.28f, .75f, .137f);
 	float clockMaterialSpeed = 2;
@@ -294,6 +293,12 @@ public class AlphabetaScript : MonoBehaviour
 	float clockFaceScaleSpeed = .2f;
 	float pacerDelay;
 	public AudioSource quarterSound;
+	public AudioSource questionSound;
+	public AudioSource answerSound;
+	public AudioSource warningSound;
+	int questionSoundCounter;
+	public AudioSource underlineSound;
+
 	void Start()
 	{
 		droneHighVolume = droneSound.volume;
@@ -972,6 +977,8 @@ public class AlphabetaScript : MonoBehaviour
 				if (swapCounter > 3)
 				{
 					swapCounter = 0;
+					//swapSounds = ShuffleSoundArray(swapSounds);
+					//swap2Sounds = ShuffleSoundArray(swap2Sounds);
 				}
 			}
 
@@ -1536,14 +1543,12 @@ public class AlphabetaScript : MonoBehaviour
 	IEnumerator WriteLetters(int sentenceCounter, bool isInput)
 	{
 		if (isPaused)yield break;
-		
 
-		Debug.Log("WriteLetters , sentenceCounter : " + sentenceCounter + " currentSentenceCounter : " + currentSentenceCounter + " questionCounter : " + questionCounter + " questionHanRotations : " + questionHandRotations[questionCounter].name);
+		//Debug.Log("WriteLetters , sentenceCounter : " + sentenceCounter + " currentSentenceCounter : " + currentSentenceCounter + " questionCounter : " + questionCounter + " questionHanRotations : " + questionHandRotations[questionCounter].name);
 
 		if (!isDebugModeOn) yield return new WaitForSeconds(1.5f);
-
 		string sentenceString = "sentence" + sentenceCounter;
-		Debug.Log("Write Letters sentenceString: " + sentenceString);
+		//Debug.Log("Write Letters sentenceString: " + sentenceString);
 		GameObject sentenceParent = GameObject.Find(sentenceString);
 		Transform firstChild = sentenceParent.transform.GetChild(0);
 		float delay;
@@ -1563,6 +1568,14 @@ public class AlphabetaScript : MonoBehaviour
 		//float finalDelay = 0;
 		if (!isInput) //Normal Dialogue (Question, Answer)
         {
+			questionSoundCounter++;
+			if (questionSoundCounter == 2)
+				questionSoundCounter = 0;// for the purpose of playing the question, or answer sound.
+
+			Debug.Log("questionCounter : " + questionSoundCounter);
+			if (questionSoundCounter == 1)cameraScript.questionSound.Play();
+			else cameraScript.answerSound.Play();
+
 			int i = 0;
 			foreach (Transform child in sentenceParent.transform)
 			{
@@ -1583,7 +1596,7 @@ public class AlphabetaScript : MonoBehaviour
 				{
 					delay = punctuationDelay;
 				}
-				Debug.Log("insinde 1 Write Letters" + "isInput" + isInput);
+				//Debug.Log("insinde 1 Write Letters" + "isInput" + isInput);
 
 				yield return new WaitForSeconds(delay);
 			}
@@ -1592,6 +1605,7 @@ public class AlphabetaScript : MonoBehaviour
 		}
 		else //Input
         {
+			cameraScript.inputSound.Play();
 			radialTargetColor = new Color(1, 1, 1, 1);
 			ResetRadials(inputRadials);
 			ResetRadials(inputRadials2);
@@ -1607,7 +1621,7 @@ public class AlphabetaScript : MonoBehaviour
 				tempPos += distanceXYZ;
 				child.transform.position = tempPos;
 				yield return new WaitForSeconds(delay);
-				Debug.Log("insinde 2 Write Letters" + "isInput" + isInput);
+				//Debug.Log("insinde 2 Write Letters" + "isInput" + isInput);
 			}
 			//if (sentenceCounter == 22) isPictureScrambling = false;
 			yield return new WaitForSeconds(durationOfInput);
@@ -1625,7 +1639,7 @@ public class AlphabetaScript : MonoBehaviour
 		float delay;
 		float distanceY;
 		Vector3 distanceXYZ;
-		Debug.Log("Return 1: sentenceCounter");
+		//Debug.Log("Return 1: sentenceCounter");
 
         string sentenceString = "sentence" + sentenceCounter;
         GameObject sentenceParent = GameObject.Find(sentenceString);
@@ -1635,7 +1649,7 @@ public class AlphabetaScript : MonoBehaviour
         Vector3 tempPos;
         distanceXYZ = firstChild.transform.position - spawnPointDialogue;
         distanceXYZ.y += (letterHeight * (sentenceCounter));
-		Debug.Log("Return 2: sentenceCounter");
+		//Debug.Log("Return 2: sentenceCounter");
 
 		foreach (Transform child in sentenceParent.transform)
         {
@@ -1694,7 +1708,7 @@ public class AlphabetaScript : MonoBehaviour
 		bool droppedNewLine = false;
 		int j = 0;
 
-		Debug.Log("underlineAmount / underlineGeneratorMax : " + Mathf.Floor(underlineAmount / underlineGeneratorMax));
+		//Debug.Log("underlineAmount / underlineGeneratorMax : " + Mathf.Floor(underlineAmount / underlineGeneratorMax));
 		if (currentSentenceCounter == 13)
 		{
 			for (int i = 0; i < underlineAmount; i++)
@@ -1735,7 +1749,7 @@ public class AlphabetaScript : MonoBehaviour
 
 	void ProcessSentenceAndSetToParent(string sentence, int sentenceCounter)
 	{
-		Debug.Log("process - sentenceCounter: " + sentenceCounter + "sentence : " + sentence);
+		//Debug.Log("process - sentenceCounter: " + sentenceCounter + "sentence : " + sentence);
 
 		List<GameObject> emptySentenceList = new List<GameObject>();
 		List<string> charactersInSentence = new List<string>();
@@ -1750,7 +1764,7 @@ public class AlphabetaScript : MonoBehaviour
 		textPosition.x = startingSlaveTextPosition.x;
 		sentenceParentPrefabs.Add(Instantiate(sentenceParentPrefab, GameObject.Find("GeneratedText").transform));
 		sentenceParentPrefabs[sentenceCounter].name = "sentence" + sentenceCounter; // this line
-		Debug.Log("process3 - sentenceCounter: " + sentenceCounter);
+		//Debug.Log("process3 - sentenceCounter: " + sentenceCounter);
 
 		sentenceParentPrefabs[sentenceCounter].transform.SetParent(GameObject.Find("GeneratedText").transform);
 
@@ -1772,7 +1786,7 @@ public class AlphabetaScript : MonoBehaviour
                             textPosition -= incrementValueDown;
                             textPosition.x = startingSlaveTextPosition.x;
                             printCharacterCounter = 0;
-                            Debug.Log("process3.2 - sentenceCounter: " + sentenceCounter + "  i: " + i + " j: " + j.name);
+                           // Debug.Log("process3.2 - sentenceCounter: " + sentenceCounter + "  i: " + i + " j: " + j.name);
                         }
                         else
                         {
@@ -1791,7 +1805,7 @@ public class AlphabetaScript : MonoBehaviour
 							//Debug.Log(" emptysentenceList.Count : " + emptySentenceList.Count);
 							emptySentenceList.Add(prefabAlphabetLetters[i]);
                             textPosition += incrementValueRight;
-                            Debug.Log("process3.4 - sentenceCounter: " + sentenceCounter);
+                           // Debug.Log("process3.4 - sentenceCounter: " + sentenceCounter);
 
 
                             if ((horizontalCharacterLimit - printCharacterCounter) <= 5 && charactersInSentence[i + 1] != "$") // Start checking for words larger than 15 characters long, 15 spaces away from end of line, $ is the end of sentence
@@ -1975,7 +1989,7 @@ public class AlphabetaScript : MonoBehaviour
 	void PlaySound()
 	{
 		tickSound.Play();
-		Debug.Log("Play Sound" + tickCounter);
+		//Debug.Log("Play Sound" + tickCounter);
         //tickSounds[1].Play();
 
         tickCounter++;
@@ -2021,14 +2035,14 @@ public class AlphabetaScript : MonoBehaviour
         swapHandCounter++;
 		if (swapHandCounter == 1)
         {
-			Debug.Log("1");
+			//Debug.Log("1");
 			destinationScrambleRotation1 = clockHandRotations[letterToSwap1];
 			destinationScrambleRotation2 = destinationScrambleRotation1;
 			destinationScrambleRotation1 = clockHandRotations[letterToSwap2];
 		}
         else
         {
-			Debug.Log("2");
+			//Debug.Log("2");
 			destinationScrambleRotation2 = clockHandRotations[letterToSwap1];
 			destinationScrambleRotation1 = destinationScrambleRotation2;
 			destinationScrambleRotation2 = clockHandRotations[letterToSwap2];
@@ -2259,7 +2273,7 @@ public class AlphabetaScript : MonoBehaviour
 			timeElapsed += Time.deltaTime;
 			yield return null;
 		}
-		Debug.Log("isPictureScrabling : " + isPictureScrambling);
+		//Debug.Log("isPictureScrabling : " + isPictureScrambling);
 		//if (!reset)ScramblePicture();
 	}
 
@@ -2912,6 +2926,7 @@ public class AlphabetaScript : MonoBehaviour
         else
         {
 			underlineWordCanvas.alpha = 1;
+			underlineSound.Play();
 		}
 	}
 
@@ -3010,6 +3025,7 @@ public class AlphabetaScript : MonoBehaviour
 			Color tempColor1 = radialTargetColor;
 			tempColor1.a = 1;
 			radialTargetColor = tempColor1;
+			warningSound.Play();
 		}
         else
         {

@@ -70,6 +70,10 @@ public class CameraScript : MonoBehaviour
     float cameraRotateSpeed = 1;
     float timeRemaining = 5;
     bool isSlowDownDolls;
+    public AudioSource questionSound;
+    public AudioSource answerSound;
+    public AudioSource inputSound;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -101,6 +105,7 @@ public class CameraScript : MonoBehaviour
         if (timeRemaining <= 0 && !isDialogueStarted && !isEndActive)
         {
             StartQuestions();
+
         }
 
         // Debug.Log("DOF " + depthOfFieldBlur.focusDistance.value);
@@ -216,6 +221,7 @@ public class CameraScript : MonoBehaviour
     public void StartQuestions()
     {
         //alphabet.droneSound.Play();
+
         spotlightTargetIntensity = 1f;
         isDialogueStarted = true;
         alphabet.questionCounter = 1;
@@ -286,8 +292,7 @@ public class CameraScript : MonoBehaviour
 
     public void Answer() // turn on right character
     {
-        Debug.Log("Answer");
-
+      //  Debug.Log("Answer");
         alphabet.underlineAlpha = 0;
         blurTarget = dofBlurOff;
         isTalkingDoll2 = true;
@@ -300,7 +305,7 @@ public class CameraScript : MonoBehaviour
     {
         Debug.Log("Question");  
         alphabet.questionCounter++;
-        alphabet.questionSound.Play();
+        //alphabet.questionSound.Play();
         alphabet.questionDestinationRotation = alphabet.questionHandRotations[alphabet.questionCounter];
         if (!isDialogueStarted) return;
         alphabet.movingToNextQuestion = false;
