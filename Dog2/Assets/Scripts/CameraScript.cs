@@ -73,12 +73,12 @@ public class CameraScript : MonoBehaviour
     public AudioSource questionSound;
     public AudioSource answerSound;
     public AudioSource inputSound;
+    public AudioSource finalSound;
+    public float cameraRotateSpeedTarget = 0;
     
     // Start is called before the first frame update
     void Start()
     {
-        cameraRotateSpeed = Random.Range(80, 130);
-        cameraRotateSpeed /= 100;
         //  middleTarget.position = cameraTarget.transform.position;
         cameraMidStartingPosition = cameraMid.transform.position;
         volumeBlur.profile.TryGetSettings(out depthOfFieldBlur);
@@ -93,6 +93,8 @@ public class CameraScript : MonoBehaviour
         alphabet = GameObject.Find("MainScript").GetComponent<AlphabetaScript>();
         animDoll1.speed = 0f;
         animDoll2.speed = 0f;
+        cameraRotateSpeed = Mathf.Lerp(cameraRotateSpeed, 0, 1 * Time.deltaTime);
+
     }
 
     // Update is called once per frame
@@ -105,10 +107,7 @@ public class CameraScript : MonoBehaviour
         if (timeRemaining <= 0 && !isDialogueStarted && !isEndActive)
         {
             StartQuestions();
-
         }
-
-        // Debug.Log("DOF " + depthOfFieldBlur.focusDistance.value);
         if (Input.GetKeyDown("1"))
         {
             StartDoll1();
@@ -127,26 +126,19 @@ public class CameraScript : MonoBehaviour
             testRotation = false;
             StartEnd();
         }
-  
 
         cameraMid.transform.LookAt(cameraTarget.position, Vector3.up);
         spotlight.transform.LookAt(spotlightTarget.position);
         depthOfFieldBlur.focusDistance.value = Mathf.Lerp(depthOfFieldBlur.focusDistance.value, blurTarget, blurSpeed * Time.deltaTime);
 
-       /* if (testRotation)
-        {
-            cameraMid.transform.RotateAround(cameraTarget.position, Vector3.down, 1 * Time.deltaTime);
-            animDoll1.speed = Mathf.Lerp(animDoll1.speed, doll1TargetSpeed, 3f * Time.deltaTime);
-            animDoll2.speed = Mathf.Lerp(animDoll2.speed, doll2TargetSpeed, 3f * Time.deltaTime);
-            this.transform.RotateAround(cameraTarget.position, Vector3.up, 5 * Time.deltaTime);
-            this.transform.LookAt(cameraTarget.position);
-        }*/
         if (isDialogueStarted)
         {
             spotlight.GetComponent<Light>().intensity = Mathf.Lerp(spotlight.GetComponent<Light>().intensity, spotlightTargetIntensity, spotlightIntensitySpeed * Time.deltaTime);
             this.transform.RotateAround(cameraTarget.position, Vector3.up, 5 * Time.deltaTime);
             this.transform.LookAt(cameraTarget.position);
-            cameraMid.transform.RotateAround(cameraTarget.position, Vector3.down, 1 * Time.deltaTime);
+            cameraMid.transform.RotateAround(cameraTarget.position, Vector3.down, cameraRotateSpeed * Time.deltaTime);
+            cameraRotateSpeed = Mathf.Lerp(cameraRotateSpeed, cameraRotateSpeedTarget, 1 * Time.deltaTime);
+
             /* cameraMid.transform.LookAt(cameraTarget.position, Vector3.up);
              spotlight.transform.LookAt(spotlightTarget.position);*/
             animDoll1.speed = Mathf.Lerp(animDoll1.speed, doll1TargetSpeed, 3f * Time.deltaTime);
@@ -250,6 +242,7 @@ public class CameraScript : MonoBehaviour
 
     public void StartEnd()
     {
+        finalSound.Play();
         animDoll1.SetBool("Reverse", true);
         animDoll2.SetBool("Reverse", true);
         isDialogueStarted = false;

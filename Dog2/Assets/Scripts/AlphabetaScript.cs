@@ -188,6 +188,7 @@ public class AlphabetaScript : MonoBehaviour
 	private float timescaleTarget = 1;
 	private float timescaleTargetSpeed = 4f;
 	private float timescaleTimerCount = 4f;
+	private float timescaleTimerCountStart = 4f;
 	public int questionCounter;
 	private int questionCycleCounter = 1;
 	private int cycleCounter;
@@ -301,14 +302,6 @@ public class AlphabetaScript : MonoBehaviour
 
 	void Start()
 	{
-		droneHighVolume = droneSound.volume;
-        for (int i = 1; i < Display.displays.Length; i++)
-        {
-            Display.displays[i].Activate();
-        }
-
-	//	clockBlurTarget = clockBlurOff;
-
 		if (isDebugModeOn)
 		{
 			endOfQuestionDelay = 1;
@@ -317,45 +310,12 @@ public class AlphabetaScript : MonoBehaviour
 			timescaleTimerCount = 2f;
 			punctuationDelay = .1f;
 		}
-		//droneTargetPitch = droneHighPitch;
-		//droneSound.volume = 0;
-		radialTargetColor = new Color(1, 1, 1, 1);
-		clockFaceStartScale = clockFace.transform.localScale;
-		clockFaceTargetScale = clockFace.transform.localScale;
-		clockFaceScaleMin.x = clockFaceTargetScale.x * .95f;
-		clockFaceScaleMin.y = clockFaceTargetScale.x * .95f;
-		clockFaceScaleMin.z = clockFaceTargetScale.z * .95f;
-		targetIntensityClock = targetIntensityMin;
-		clockMaterial.color = clockTargetColor;
-		clockMaterialLines.color = clockTargetColor;
-		clockFace.transform.localScale = clockFaceTargetScale;
-		InvokeRepeating("UnderlineBlinker", 0, .5f);
-		InvokeRepeating("CursorBlinker", 0, .5f);
-		//InvokeRepeating("UnderlineInputBlinker", 0, .5f);
-		volumeClockBlur.profile.TryGetSettings(out depthOfFieldClockBlur);
-		underlineAlpha = 0;
-		charAmount = Random.Range(0, 20);
-		targetBlackSpeed = targetBlackSpeedNormal;
-		for (int i = 0; i<charAmount; i++)
-        {
-			randomString += glyphs[Random.Range(0, glyphs.Length)];
-        }
-		randomString += " $";
 
-		clockHandScale = clockHandScaleNormal;
-		cameraBackgroundColor = cameraBackgroundColorOn;
-		//ResetSlaveTextCount();
 		InitializeValues();
-		//ResetSlaveTextCount();
 		StartPacers();
-		//GenerateText();
 		ConvertStrings();
-		//GenerateUnderlines(24, 0,0,0);
-
 		UpdateSlaveTextAmountAndColor();
 		GenerateNextSentence();
-
-		//ResetSlaveTextCount();
 	}
 
 	// Update is called once per frame
@@ -387,7 +347,7 @@ public class AlphabetaScript : MonoBehaviour
 					timescaleTarget = 1f;
 					cameraBackgroundColor = cameraBackgroundColorOn;
 					isTimescalePaused = false;
-					timescaleTimerCount = 1;
+					timescaleTimerCount = timescaleTimerCountStart;
 					clockBlurTarget = clockBlurOn;
 					targetBlackSpeed = targetBlackSpeedNormal;
 					//droneSound.Stop();
@@ -642,8 +602,8 @@ public class AlphabetaScript : MonoBehaviour
 			timeElapsed += Time.deltaTime;
 			yield return null;
 		}
-		object1.transform.localPosition = target1Position;
-		object2.transform.localPosition = target2Position;
+		/*object1.transform.localPosition = target1Position;
+		object2.transform.localPosition = target2Position;*/
 	}
 
 	IEnumerator LerpBottomSwap(Button object1, Button object2)
@@ -663,8 +623,8 @@ public class AlphabetaScript : MonoBehaviour
 			timeElapsed += Time.deltaTime;
 			yield return null;
 		}
-		object1.transform.localPosition = target1Position;
-		object2.transform.localPosition = target2Position;
+		/*object1.transform.localPosition = target1Position;
+		object2.transform.localPosition = target2Position;*/
 	}
 
 	IEnumerator LerpVerticalSwap(Button object1, Button object2, Button target1, Button target2, int swapCutter)
@@ -1030,36 +990,36 @@ public class AlphabetaScript : MonoBehaviour
 		Goodbye += "...... Next. $";
 		sentencesMasterList.Clear();
 		sentencesMasterList.Add(Greeting);//0
-        sentencesMasterList.Add("KKKKKKKKKKKKK $");//1
-        sentencesMasterList.Add("1[KKKKKKKKKKKKK $"); //2
+        sentencesMasterList.Add("YYYYYYYYYYYYY $");//1
+        sentencesMasterList.Add("1[YYYYYYYYYYYYY $"); //2
 
         sentencesMasterList.Add("2[Good. Now Repeat the following words: DOG IS GOD. $"); //3
-        sentencesMasterList.Add("KKK KK KKK $");//4
-        sentencesMasterList.Add("2[KKK KK KKK. $");//5
+        sentencesMasterList.Add("YYY YY YYY $");//4
+        sentencesMasterList.Add("2[YYY YY YYY. $");//5
 
         sentencesMasterList.Add("3[I am down bc?...      1[ I Dont know        2[ They know          3[ I know             4[ Not saying  $");//6
-        sentencesMasterList.Add("K $");//7
-        sentencesMasterList.Add("3[ K $");//8
+        sentencesMasterList.Add("Y $");//7
+        sentencesMasterList.Add("3[ Y $");//8
 
         sentencesMasterList.Add("4[Please repeat the following:           I WILL NOT PLAY GOD! $");//9
-        sentencesMasterList.Add("K KKKK KKK KK         KK KKK $");//10
-        sentencesMasterList.Add("4[ K KKK KKK KKKK        KKK! $");//11
+        sentencesMasterList.Add("Y YYYY YYY YY         YY YYY $");//10
+        sentencesMasterList.Add("4[ Y YYY YYY YYYY        YYY! $");//11
 
         sentencesMasterList.Add("5[OK Now write whatever you feel:  $");//12
-        sentencesMasterList.Add("KKKKKKKKKKKKK    KKKKKKKKKKKKK    KKKKKKKKKKKKK    KKKKKKKKKKKKK $");//13
-        sentencesMasterList.Add("5[KKKKKKKKKKK    KKKKKKKKKKKKK    KKKKKKKKKKKKK    KKKKKKKKKKKKK $");//14
+        sentencesMasterList.Add("YYYYYYYYYYYYY    YYYYYYYYYYYYY    YYYYYYYYYYYYY    YYYYYYYYYYYYY $");//13
+        sentencesMasterList.Add("5[YYYYYYYYYYY    YYYYYYYYYYYYY    YYYYYYYYYYYYY    YYYYYYYYYYYYY $");//14
 
         sentencesMasterList.Add("6[Yes. True (T) False (F): I remember the last time I felt happy. I remember the last time I felt sad. I am looking forward to tomorrow. $");//15
-        sentencesMasterList.Add("K K K $");//16
-        sentencesMasterList.Add("6[K and K and K $");//17
+        sentencesMasterList.Add("Y Y Y $");//16
+        sentencesMasterList.Add("6[Y and Y and Y $");//17
 
         sentencesMasterList.Add("7[Good. Now Repeat the following words: DOG IS GOD. $"); //18
-        sentencesMasterList.Add("KKK KK KKK $");//19
-        sentencesMasterList.Add("7[KKK KK KKK. $");//20
+        sentencesMasterList.Add("YYY YY YYY $");//19
+        sentencesMasterList.Add("7[YYY YY YYY. $");//20
 
         sentencesMasterList.Add("8[Now look at the picture, write what you see:  $");//21
-        sentencesMasterList.Add("KKKKKKKKKKKKK $");//22
-        sentencesMasterList.Add("8[KKKKKKKKKKKKK $");//23
+        sentencesMasterList.Add("YYYYYYYYYYYYY $");//22
+        sentencesMasterList.Add("8[YYYYYYYYYYYYY $");//23
 
         sentencesMasterList.Add(Goodbye);//24
     }
@@ -1149,34 +1109,45 @@ public class AlphabetaScript : MonoBehaviour
 
 	void InitializeValues()
 	{
+		for (int i = 1; i < Display.displays.Length; i++)
+		{
+			Display.displays[i].Activate();
+		}
+		for (int i = 0; i < charAmount; i++)
+		{
+			randomString += glyphs[Random.Range(0, glyphs.Length)];
+		}
+		randomString += " $";
 		ClearRadials();
+		InvokeRepeating("UnderlineBlinker", 0, .5f);
+		InvokeRepeating("CursorBlinker", 0, .5f);
+
 		pictureCanvasGroup.alpha = 0;
 		string tempSound;
-
-/*		GameObject[] collectedSwaps = GameObject.FindGameObjectsWithTag("GameController");
-		collectedSwaps = collectedSwaps.OrderBy(i => i.name).ToArray();
-        for (int i = 0; i < swapSounds.Length; i++)
-        {
-            swapSounds[i] = collectedSwaps[i].GetComponent<AudioSource>();
-        }*/
-
-
-
-
-        underlineWordPositions = new List<Vector3>();
+		droneHighVolume = droneSound.volume;
+		timescaleTimerCountStart = timescaleTimerCount;
+		radialTargetColor = new Color(1, 1, 1, 1);
+		clockFaceStartScale = clockFace.transform.localScale;
+		clockFaceTargetScale = clockFace.transform.localScale;
+		clockFaceScaleMin.x = clockFaceTargetScale.x * .95f;
+		clockFaceScaleMin.y = clockFaceTargetScale.x * .95f;
+		clockFaceScaleMin.z = clockFaceTargetScale.z * .95f;
+		targetIntensityClock = targetIntensityMin;
+		clockMaterial.color = clockTargetColor;
+		clockMaterialLines.color = clockTargetColor;
+		clockFace.transform.localScale = clockFaceTargetScale;
+		volumeClockBlur.profile.TryGetSettings(out depthOfFieldClockBlur);
+		underlineAlpha = 0;
+		charAmount = Random.Range(0, 20);
+		targetBlackSpeed = targetBlackSpeedNormal;
+		clockHandScale = clockHandScaleNormal;
+		cameraBackgroundColor = cameraBackgroundColorOn;
+		underlineWordPositions = new List<Vector3>();
 		underlineWordPositions.Add(new Vector3(0, 0f, 0)); //off
 		underlineWordPositions.Add(new Vector3(4025, -516.5f, -182)); // sentence 4
 		underlineWordPositions.Add(new Vector3(4570, -585.5f, -143)); // sentence 9
 		underlineWordPositions.Add(new Vector3(4765, -120f, -182)); // 4 lines
-
 		textCameraPositions = new List<Vector3>();
-        /*	textCameraPositions.Add(new Vector3(7669.6f, 54f, 1574)); // 1 line
-            textCameraPositions.Add(new Vector3(7669.6f, -195f, 1574)); // 2 line
-            textCameraPositions.Add(new Vector3(7669.6f, -495f, 1574)); // 3 line
-            textCameraPositions.Add(new Vector3(7669.6f, -694f, 1574)); // 4 lines needs readjustment
-            textCameraPositions.Add(new Vector3(7669.6f, -987f, 1574)); // 5 lines
-            textCameraPositions.Add(new Vector3(7669.6f, -1670f, 1574)); // 7 lines*/
-
         textCameraPositions.Add(new Vector3(7197, 54f, 1574)); // 0 line
 		textCameraPositions.Add(new Vector3(7197, 54f, 1574)); // 1 line
 		textCameraPositions.Add(new Vector3(7505, 54f, 1574)); // 2 line
@@ -1203,17 +1174,12 @@ public class AlphabetaScript : MonoBehaviour
 		textCameraPositions.Add(new Vector3(7669.6f, 54f, 1574)); // 23 lines
         textCameraPositions.Add(new Vector3(7489.6f, 54f, 1574)); // 24 lines
 		textCameraPositions.Add(new Vector3(7197, 54f, 1574)); // 0 line
-
-
-
 		underlineWidths = new List<Vector2>();
 		underlineWidths.Add(new Vector2(1616.34f, 338)); // normal
 		underlineWidths.Add(new Vector2(2795, 338)); // large
-
 		radialPositions = new List<Vector3>();
 		radialPositions.Add(new Vector3(12491, -2062.5f, 0));
 		radialPositions.Add(new Vector3(12491, -2589.5f, 0));
-
 		destinationScrambleRotation2 = clockHandRotations[letterToSwap2];
 		for (int i = 0; i < abstractArray.Length; i++)
 		{
@@ -1224,7 +1190,6 @@ public class AlphabetaScript : MonoBehaviour
 		{
 		//	Debug.Log("shuffled : " + abstractArray[i]);
 		}
-
 		glow = clockCameraFocus.GetComponent<CameraFilterPack_Glow_Glow>();
 		underlineCamera = GameObject.Find("UnderlineCamera");
 		underlineCameraOnPosition = underlineCamera.transform.position;
@@ -1386,7 +1351,9 @@ public class AlphabetaScript : MonoBehaviour
                 radialSelector = 1;
                 break;
 			case 6:
-	
+				float cameraRotateSpeed = Random.Range(80, 130);
+				cameraRotateSpeed /= 100;
+				cameraScript.cameraRotateSpeedTarget = cameraRotateSpeed;
 				textCamera.transform.localPosition = textCameraPositions[4];
 				textCameraBlank.transform.localPosition = textCameraPositions[4];
 				break;
@@ -2057,17 +2024,15 @@ public class AlphabetaScript : MonoBehaviour
 		InvokeRepeating("Pacer", 1, clockTime);
 		if (isSwapOn) InvokeRepeating("SwapPacer", 1, slowLerpDuration);
 		InvokeRepeating("ScramblePicture", 1,(pictureLerpSpeed + .2f));
-
 		//InvokeRepeating("ScramblePacer", 1, scrambleLerpDuration - .5f);
 	}
 
 	void SpeedUpPacer()
     {
-
-		clockTime /= 1.08f;
-		slowLerpDuration /= 1.08f;
+		clockTime /= 1.04f;
+		slowLerpDuration /= 1.04f;
 		lerpDuration /= 1.04f;
-		targetBlackSpeed *= 1.4f;
+		targetBlackSpeed *= 1.7f;
 		clockHandSpeed *= 1.05f;
 		clockMaterialSpeed *= 1.08f;
 		clockFaceScaleSpeed *= 1.08f;
