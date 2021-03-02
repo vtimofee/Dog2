@@ -79,6 +79,7 @@ public class AlphabetaScript : MonoBehaviour
 	//private Color dummyBlue = new Color(.694f, .87f, 1f, 1);
 	private Color dummyRed = Color.red;
 	private Color dummyBlue = new Color(.27f, .545f, .749f, 1);
+	//private Color dummyBlue = new Color(0f, 0f, 1f, 1);
 	private int coCounter = 0;
 	private int swapFrequency = 1;
 	private int initialTopCount = 1;
@@ -204,7 +205,7 @@ public class AlphabetaScript : MonoBehaviour
 	private float clockBlurOff = 60f;
 	private float targetBlackSpeed;
 	private float targetBlackSpeedPause = 3f;
-	private float targetBlackSpeedNormal = .1f;
+	private float targetBlackSpeedNormal = .5f;
 	public float underlineAlpha;
 	public GameObject underlineWord;
 	public CanvasGroup underlineWordCanvas;
@@ -297,6 +298,8 @@ public class AlphabetaScript : MonoBehaviour
 	int questionSoundCounter;
 	public AudioSource underlineSound;
 	float failSafeTimer;
+	float tempTime;
+	bool isGamePaused;
 	void Start()
 	{
 		if (isDebugModeOn)
@@ -308,6 +311,7 @@ public class AlphabetaScript : MonoBehaviour
 			punctuationDelay = .1f;
 		}
 
+		Cursor.visible = false;
 		InitializeValues();
 		StartPacers();
 		ConvertStrings();
@@ -317,8 +321,10 @@ public class AlphabetaScript : MonoBehaviour
 
 	void Update()
 	{
-		failSafeTimer += Time.unscaledDeltaTime;
+		if (!isGamePaused)failSafeTimer += Time.unscaledDeltaTime;
+		Debug.Log(failSafeTimer);
 		if (failSafeTimer > 500) Restart();
+
 		ManageColors();
 
 		if (isFinalTimeScalePaused)
@@ -437,7 +443,7 @@ public class AlphabetaScript : MonoBehaviour
 		}
 		if (Input.GetKey("5"))
 		{
-			dueToSpeedUp = true;
+			Screen.fullScreen = true;
 		}
 		if (Input.GetKeyDown("6"))
         {
@@ -467,7 +473,32 @@ public class AlphabetaScript : MonoBehaviour
 		{
 			Application.Quit();
 		}
+		if (Input.GetKey("r"))
+        {
+			Resources.UnloadUnusedAssets();
+			SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
+		}
+		if (Input.GetKeyDown("p"))
+		{
+			PauseGame();
+		}
 	}
+
+	void PauseGame()
+    {
+		if (!isGamePaused)
+        {
+			isGamePaused = true;
+			tempTime = Time.timeScale;
+			Time.timeScale = 0;
+        }
+        else
+        {
+			Time.timeScale = tempTime;
+			isGamePaused = false;
+        }
+
+    }
 
 	AudioSource[] ShuffleSoundArray(AudioSource[] array)
 	{
@@ -2773,7 +2804,7 @@ public class AlphabetaScript : MonoBehaviour
 		Time.timeScale = 1;
 		isPaused = false;
 		Resources.UnloadUnusedAssets();
-		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single); start = true;
+		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
 	}
 
 	void AbstractLetterTrigger()

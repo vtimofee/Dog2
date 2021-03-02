@@ -273,7 +273,7 @@ public class CameraScript : MonoBehaviour
     {
         Debug.Log("Prepare for Input");
         
-        alphabet.underlineAlpha = .5f;
+        alphabet.underlineAlpha = .3f;
         isTalkingDoll1 = false;
         doll1TargetSpeed = 0;
         StartCoroutine(SwapTargets(cameraTarget, cameraTargets[0]));
