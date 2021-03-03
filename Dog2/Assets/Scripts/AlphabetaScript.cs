@@ -2803,9 +2803,11 @@ public class AlphabetaScript : MonoBehaviour
 
 	public void Restart()
     {
+
 		clockFace.transform.localScale = clockFaceStartScale;
 		Time.timeScale = 1;
 		isPaused = false;
+		CancelInvoke();
 		Resources.UnloadUnusedAssets();
 		Loader.Load(Loader.Scene.AlphabetFinal);
 		//SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
