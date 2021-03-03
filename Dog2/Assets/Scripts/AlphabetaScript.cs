@@ -180,7 +180,7 @@ public class AlphabetaScript : MonoBehaviour
 	public Material clockMaterialLines;
 	private Color clockTargetColor = new Color(1, 1, 1, .9f);
 	private Color clockStartColor = new Color(1, 1, 1, .9f);
-	private Color clockTransparentColor = new Color(1, 1, 1, .1f);
+	private Color clockTransparentColor = new Color(1, 1, 1, .3f);
 	private Color underlineTargetColor = new Color(1, 1, 1, 1f);
 	private Color underlineTransparentColor = new Color(1, 1, 1, 0f);
 	private int swapHandCounter;
@@ -327,7 +327,7 @@ public class AlphabetaScript : MonoBehaviour
 		if (isFinalTimeScalePaused)
 		{
 			finalTimescaleTimerCount -= Time.unscaledDeltaTime;
-			Debug.Log("finalTimeScaletimerCount : " + finalTimescaleTimerCount);
+			//Debug.Log("finalTimeScaletimerCount : " + finalTimescaleTimerCount);
 			if (finalTimescaleTimerCount <= 1)
 			{
 				ResetValues();
@@ -409,7 +409,7 @@ public class AlphabetaScript : MonoBehaviour
 			resetHandCanvasGroup.alpha = Mathf.Lerp(resetHandCanvasGroup.alpha, .9f, .2f * Time.deltaTime);
 			resetHandTimer += 2 * Time.unscaledDeltaTime;
 			resetHand.eulerAngles = new Vector3(0, 0, -resetHandTimer * 10f);
-			Debug.Log("resetHandTimer :" + resetHandTimer);
+			//Debug.Log("resetHandTimer :" + resetHandTimer);
 			if (resetHandTimer > 36)
 			{
 				PrepareForRestart();
@@ -459,11 +459,11 @@ public class AlphabetaScript : MonoBehaviour
 		}
 		if (Input.GetKey("9"))
 		{
-			Debug.Log("position : " + underlineWord.transform.position);
+			//Debug.Log("position : " + underlineWord.transform.position);
 		}
 		if (Input.GetKey("0"))
 		{
-			Debug.Log("position cursor: " + cursor.transform.position);
+			//Debug.Log("position cursor: " + cursor.transform.position);
 		}
 		if (Input.GetKey("p"))
 		{
@@ -562,8 +562,8 @@ public class AlphabetaScript : MonoBehaviour
 		Quaternion initial1Rotation = object1.transform.rotation;
 		Quaternion initial2Rotation = object2.transform.rotation;
 
-		if (initial1Rotation == target1Rotation) Debug.Log("SAME ALREADY");
-		while (timeElapsed < lerpDuration)
+/*		if (initial1Rotation == target1Rotation) Debug.Log("SAME ALREADY");
+*/		while (timeElapsed < lerpDuration)
 		{
 			float t = timeElapsed / lerpDuration;
 			t = t * t * t * (t * (6f * t - 15f) + 10f);
@@ -773,7 +773,7 @@ public class AlphabetaScript : MonoBehaviour
 			q3InitialPositions[i] = buttons_q3[i].transform.position;
 			q4InitialPositions[i] = buttons_q4[i].transform.position;
 		}
-		Debug.Log("Aq1 original : " + q1InitialPositions[0] + " Aq1 current " + q1CurrentPositions[0]);
+		//Debug.Log("Aq1 original : " + q1InitialPositions[0] + " Aq1 current " + q1CurrentPositions[0]);
 		Quaternion[] q1CurrentRotations = new Quaternion[26];
 		Quaternion[] q2CurrentRotations = new Quaternion[26];
 		Quaternion[] q3CurrentRotations = new Quaternion[26];
@@ -2329,7 +2329,7 @@ public class AlphabetaScript : MonoBehaviour
 		allSlaveTextQuadrants2 = allSlaveTextQuadrants2Arr.ToList();
 		List<Vector3> tempPositions1 = new List<Vector3>(allSlaveTextQuadrants1.Count);
 		List<Vector3> tempPositions2 = new List<Vector3>();
-		Debug.Log("heretop of swap : A;;S;aveTextQuadrants 1 count = " + allSlaveTextQuadrants1.Count + "allslaveTextQuadrants 2 count = " + allSlaveTextQuadrants2.Count);
+		//Debug.Log("heretop of swap : A;;S;aveTextQuadrants 1 count = " + allSlaveTextQuadrants1.Count + "allslaveTextQuadrants 2 count = " + allSlaveTextQuadrants2.Count);
 
 /*		foreach (GameObject i in allSlaveTextQuadrants1)
 		{
@@ -2354,7 +2354,7 @@ public class AlphabetaScript : MonoBehaviour
 			}
 		}
 
-		Debug.Log("here middle of swap");
+		//Debug.Log("here middle of swap");
 		foreach (GameObject i in allSlaveTextQuadrants1)
 		{
 			foreach (GameObject k in allSlaveTextQuadrants2)
@@ -2567,7 +2567,7 @@ public class AlphabetaScript : MonoBehaviour
 			}
 		}
 
-		Debug.Log("slaveLetterListCount : " + slaveLettersList.Count);
+		//Debug.Log("slaveLetterListCount : " + slaveLettersList.Count);
 		for (int i = 0; i < slaveLettersList.Count; i++)
 		{
 			if (slaveLettersList[i].transform.childCount > 1)
@@ -2768,7 +2768,7 @@ public class AlphabetaScript : MonoBehaviour
 		finalTimescaleTimerCount = 10;
 		Time.timeScale = 1;
 		timescaleTarget = 1;
-		Debug.Log("in 5 seconds");
+		//Debug.Log("in 5 seconds");
 		destinationRotation = clockHandRotations[0];
 		StartCoroutine(ResetPositionsAndRotations());
 		targetBlackSpeed = targetBlackSpeedPause;
@@ -2834,7 +2834,7 @@ public class AlphabetaScript : MonoBehaviour
 
 	void AbstractLetterEffect()
     {
-		Debug.Log("letterreplacementCount : " + letterReplacementCount);
+		//Debug.Log("letterreplacementCount : " + letterReplacementCount);
 		//current letter
 		string tempString_q1 = abstractArray[letterReplacementCount] + "_q1";
 		string tempString_q2 = abstractArray[letterReplacementCount] + "_q2";
@@ -3056,11 +3056,11 @@ public class AlphabetaScript : MonoBehaviour
 		GameObject[] allUnderlines = GameObject.FindGameObjectsWithTag("Player");
 		if (allUnderlines.Length == 0) return;
 
-		Debug.Log("CALLED UNDERLINE underline count: " + allUnderlines.Length);
+		//Debug.Log("CALLED UNDERLINE underline count: " + allUnderlines.Length);
 
 		for (int i = 0; i<allUnderlines.Length; i++)
         {
-			Debug.Log("here i : " + i + "underlineblinker : " + underlineBlinkCounter );
+			//Debug.Log("here i : " + i + "underlineblinker : " + underlineBlinkCounter );
 			if (allUnderlines[i].GetComponent<Image>().color == underlineTransparentColor)
             {
 				allUnderlines[i].GetComponent<Image>().color = underlineTargetColor;

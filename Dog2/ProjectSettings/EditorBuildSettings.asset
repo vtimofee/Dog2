@@ -17,7 +17,10 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/multiple-monitors.unity
     guid: b854d6c387b061649a70686a6ee07bfb
-  - enabled: 1
+  - enabled: 0
     path: Assets/alphabet4-tryingdoublecamera.unity
     guid: 06d58fa8826dfb14bb9543e53bacd2b4
+  - enabled: 1
+    path: Assets/AlphabetFinal.unity
+    guid: 97bb8503eb0bb3340966a8f26e08ada6
   m_configObjects: {}

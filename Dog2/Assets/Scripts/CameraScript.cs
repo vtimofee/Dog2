@@ -253,7 +253,7 @@ public class CameraScript : MonoBehaviour
         animDoll1.SetBool("Reverse", true);
         animDoll2.SetBool("Reverse", true);
         isDialogueStarted = false;
-        Debug.Log("here");
+        //Debug.Log("here");
         StartCoroutine(SwapTargets(cameraTarget, middleTarget));
         StartCoroutine(SwapTargets(spotlightTarget, spotlightMiddleTarget));
         // spotlightTargetIntensity = 0;
@@ -278,9 +278,9 @@ public class CameraScript : MonoBehaviour
 
     public void PrepareForInput() //turn off left character
     {
-        Debug.Log("Prepare for Input");
+       // Debug.Log("Prepare for Input");
         
-        alphabet.underlineAlpha = .3f;
+        alphabet.underlineAlpha = .5f;
         isTalkingDoll1 = false;
         doll1TargetSpeed = 0;
         StartCoroutine(SwapTargets(cameraTarget, cameraTargets[0]));
@@ -303,7 +303,7 @@ public class CameraScript : MonoBehaviour
 
     public void Question() //turn on left character, turn off right character
     {
-        Debug.Log("Question");  
+       // Debug.Log("Question");  
         alphabet.questionCounter++;
         //alphabet.questionSound.Play();
         alphabet.questionDestinationRotation = alphabet.questionHandRotations[alphabet.questionCounter];
