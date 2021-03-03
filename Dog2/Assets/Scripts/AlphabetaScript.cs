@@ -187,8 +187,8 @@ public class AlphabetaScript : MonoBehaviour
 	private float gameTimeScale = 1;
 	private float timescaleTarget = 1;
 	private float timescaleTargetSpeed = 4f;
-	private float timescaleTimerCount = 4f;
-	private float timescaleTimerCountStart = 4f;
+	private float timescaleTimerCount = 2f;
+	private float timescaleTimerCountStart = 2f;
 	public int questionCounter;
 	private int questionCycleCounter = 1;
 	private int cycleCounter;
@@ -197,15 +197,17 @@ public class AlphabetaScript : MonoBehaviour
 	private bool isTimescalePaused;
 	private Color cameraBackgroundColor;
 	private Color cameraBackgroundColorOn = new Color(.83f, .83f, .83f, 0);
-	private Color cameraBackgroundColorOff = new Color(.04f, .04f, .04f, 0);
+	private Color cameraBackgroundColorOff = new Color(.1f, .1f, .1f, 0);
 	public PostProcessVolume volumeClockBlur;
 	DepthOfField depthOfFieldClockBlur;
 	private float clockBlurTarget;
 	private float clockBlurOn = 0f;
 	private float clockBlurOff = 60f;
 	private float targetBlackSpeed;
+	private float targetBlackDummySpeed;
 	private float targetBlackSpeedPause = 3f;
 	private float targetBlackSpeedNormal = .5f;
+	private float targetBlackDummySpeedNormal = .1f;
 	public float underlineAlpha;
 	public GameObject underlineWord;
 	public CanvasGroup underlineWordCanvas;
@@ -297,9 +299,8 @@ public class AlphabetaScript : MonoBehaviour
 	public AudioSource warningSound;
 	int questionSoundCounter;
 	public AudioSource underlineSound;
-	float failSafeTimer;
 	float tempTime;
-	bool isGamePaused;
+	public bool isGamePaused;
 	void Start()
 	{
 		if (isDebugModeOn)
@@ -311,7 +312,7 @@ public class AlphabetaScript : MonoBehaviour
 			punctuationDelay = .1f;
 		}
 
-		Cursor.visible = false;
+		//Cursor.visible = false;
 		InitializeValues();
 		StartPacers();
 		ConvertStrings();
@@ -321,10 +322,6 @@ public class AlphabetaScript : MonoBehaviour
 
 	void Update()
 	{
-		if (!isGamePaused)failSafeTimer += Time.unscaledDeltaTime;
-		Debug.Log(failSafeTimer);
-		if (failSafeTimer > 500) Restart();
-
 		ManageColors();
 
 		if (isFinalTimeScalePaused)
@@ -353,6 +350,8 @@ public class AlphabetaScript : MonoBehaviour
 					timescaleTimerCount = timescaleTimerCountStart;
 					clockBlurTarget = clockBlurOn;
 					targetBlackSpeed = targetBlackSpeedNormal;
+					targetBlackDummySpeed = targetBlackDummySpeedNormal;
+
 					//droneSound.Stop();
 					if (letterReplacementCount <= letterLimit) letterReplacementCount++;
 				}
@@ -380,7 +379,7 @@ public class AlphabetaScript : MonoBehaviour
 			questionHand.transform.rotation = Quaternion.Lerp(questionHand.transform.rotation, questionDestinationRotation.rotation, 1f * Time.deltaTime);
 			glow.Intensity = Mathf.Lerp(glow.Intensity, targetIntensityClock, 2 * Time.deltaTime);
 			clockMaterial.color = Color.Lerp(clockMaterial.color, clockTransparentColor, clockMaterialSpeed * Time.deltaTime);
-			clockMaterialLines.color = Color.Lerp(clockMaterialLines.color, clockTransparentColor, 2f * Time.deltaTime);
+			clockMaterialLines.color = Color.Lerp(clockMaterialLines.color, clockTransparentColor, clockMaterialSpeed * Time.deltaTime);
 			clockCameraBlur.backgroundColor = Color.Lerp(clockCameraBlur.backgroundColor, cameraBackgroundColor, 5 * Time.unscaledDeltaTime);
 			depthOfFieldClockBlur.focalLength.value = Mathf.Lerp(depthOfFieldClockBlur.focalLength.value, clockBlurTarget, 3 * Time.deltaTime);
 			pictureCanvasGroup.alpha = Mathf.Lerp(pictureCanvasGroup.alpha, pictureAlpha, 3 * Time.deltaTime);
@@ -423,7 +422,8 @@ public class AlphabetaScript : MonoBehaviour
 			clockFace.transform.localScale = Vector3.Lerp(clockFace.transform.localScale, clockFaceStartScale, 3 * Time.deltaTime);
 			clockHandScrambler1.transform.localScale = Vector3.Lerp(clockHandScrambler1.transform.localScale, clockHandScaleSmall1, clockHandSizeSpeed * Time.deltaTime);
 			clockHandScrambler2.transform.localScale = Vector3.Lerp(clockHandScrambler2.transform.localScale, clockHandScaleSmall1, clockHandSizeSpeed * Time.deltaTime);
-
+			clockMaterial.color = Color.Lerp(clockMaterial.color, clockStartColor, clockMaterialSpeed * Time.deltaTime);
+			clockMaterialLines.color = Color.Lerp(clockMaterialLines.color, clockStartColor, clockMaterialSpeed * Time.deltaTime);
 
 			//droneSound.volume = Mathf.Lerp(droneSound.volume, droneTargetVolume, 1 * Time.deltaTime);
 			//droneSound.pitch = Mathf.Lerp(droneSound.pitch, droneTargetPitch, 1 * Time.deltaTime);
@@ -1170,6 +1170,7 @@ public class AlphabetaScript : MonoBehaviour
 		underlineAlpha = 0;
 		charAmount = Random.Range(0, 20);
 		targetBlackSpeed = targetBlackSpeedNormal;
+		targetBlackDummySpeed = targetBlackDummySpeedNormal;
 		clockHandScale = clockHandScaleNormal;
 		cameraBackgroundColor = cameraBackgroundColorOn;
 		underlineWordPositions = new List<Vector3>();
@@ -1569,7 +1570,7 @@ public class AlphabetaScript : MonoBehaviour
 			if (questionSoundCounter == 2)
 				questionSoundCounter = 0;// for the purpose of playing the question, or answer sound.
 
-			Debug.Log("questionCounter : " + questionSoundCounter);
+			//Debug.Log("questionCounter : " + questionSoundCounter);
 			if (questionSoundCounter == 1)cameraScript.questionSound.Play();
 			else cameraScript.answerSound.Play();
 
@@ -2063,6 +2064,7 @@ public class AlphabetaScript : MonoBehaviour
 		slowLerpDuration /= 1.03f;
 		lerpDuration /= 1.03f;
 		targetBlackSpeed *= 1.06f;
+		targetBlackDummySpeed *= 1.06f;
 		clockHandSpeed *= 1.03f;
 		clockMaterialSpeed *= 1.05f;
 		clockFaceScaleSpeed *= 1.05f;
@@ -2206,7 +2208,7 @@ public class AlphabetaScript : MonoBehaviour
 	void ScramblePicture()
 	{
 		if (!isPictureScrambling) return;
-		Debug.Log("Scramble Picture");
+		//Debug.Log("Scramble Picture");
 		/*scrambleCounter++;
 		if (scrambleCounter > 4) scrambleCounter = 1;*/
 
@@ -2675,10 +2677,10 @@ public class AlphabetaScript : MonoBehaviour
 			if (slaveButtons_q1[i])
 			{
 				if (!slaveButtons_q1[i]) break;
-				slaveButtons_q1[i].image.color = Color.Lerp(slaveButtons_q1[i].image.color, baseTextColor, targetBlackSpeed * Time.deltaTime);
-				slaveButtons_q2[i].image.color = Color.Lerp(slaveButtons_q2[i].image.color, baseTextColor, targetBlackSpeed * Time.deltaTime);
-				slaveButtons_q3[i].image.color = Color.Lerp(slaveButtons_q3[i].image.color, baseTextColor, targetBlackSpeed * Time.deltaTime);
-				slaveButtons_q4[i].image.color = Color.Lerp(slaveButtons_q4[i].image.color, baseTextColor, targetBlackSpeed * Time.deltaTime);
+				slaveButtons_q1[i].image.color = Color.Lerp(slaveButtons_q1[i].image.color, baseTextColor, targetBlackDummySpeed * Time.deltaTime);
+				slaveButtons_q2[i].image.color = Color.Lerp(slaveButtons_q2[i].image.color, baseTextColor, targetBlackDummySpeed * Time.deltaTime);
+				slaveButtons_q3[i].image.color = Color.Lerp(slaveButtons_q3[i].image.color, baseTextColor, targetBlackDummySpeed * Time.deltaTime);
+				slaveButtons_q4[i].image.color = Color.Lerp(slaveButtons_q4[i].image.color, baseTextColor, targetBlackDummySpeed * Time.deltaTime);
 			}
 		}
 
@@ -2770,6 +2772,7 @@ public class AlphabetaScript : MonoBehaviour
 		destinationRotation = clockHandRotations[0];
 		StartCoroutine(ResetPositionsAndRotations());
 		targetBlackSpeed = targetBlackSpeedPause;
+		targetBlackDummySpeed = targetBlackSpeedPause;
 		StartCoroutine(ResetPositionsAndRotations());
 		clockFace.transform.localScale = clockFaceStartScale;
 		resetSound.Play();
@@ -2798,13 +2801,14 @@ public class AlphabetaScript : MonoBehaviour
 	}
 
 
-	void Restart()
+	public void Restart()
     {
 		clockFace.transform.localScale = clockFaceStartScale;
 		Time.timeScale = 1;
 		isPaused = false;
 		Resources.UnloadUnusedAssets();
-		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
+		Loader.Load(Loader.Scene.AlphabetFinal);
+		//SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
 	}
 
 	void AbstractLetterTrigger()
@@ -2816,10 +2820,11 @@ public class AlphabetaScript : MonoBehaviour
         }
 		if (isTimescalePaused) return;
 		isTimescalePaused = true;
-		timescaleTarget = 0f;
+		timescaleTarget = .3f;
 		cameraBackgroundColor = cameraBackgroundColorOff;
 		clockBlurTarget = clockBlurOff;
 		targetBlackSpeed = targetBlackSpeedPause;
+		targetBlackDummySpeed = targetBlackSpeedPause;
 		// droneTargetPitch = droneLowPitch;
 		droneSound.Play();
         AbstractLetterEffect();

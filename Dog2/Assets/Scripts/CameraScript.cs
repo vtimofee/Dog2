@@ -75,7 +75,9 @@ public class CameraScript : MonoBehaviour
     public AudioSource inputSound;
     public AudioSource finalSound;
     public float cameraRotateSpeedTarget = 0;
-    
+    float failSafeTimer;
+    bool isGamePaused;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -100,6 +102,11 @@ public class CameraScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!alphabet.isGamePaused) failSafeTimer += Time.unscaledDeltaTime;
+       // Debug.Log(failSafeTimer);
+        if (failSafeTimer > 500) alphabet.Restart();
+
+
         if (timeRemaining > 0)
         {
             timeRemaining -= Time.deltaTime;
@@ -218,7 +225,7 @@ public class CameraScript : MonoBehaviour
         isDialogueStarted = true;
         alphabet.questionCounter = 1;
         alphabet.questionDestinationRotation = alphabet.questionHandRotations[alphabet.questionCounter];
-        Debug.Log("Toggle");
+      //  Debug.Log("Toggle");
         alphabet.DisplayText(false);
         if (isTalkingDoll1)
         {
