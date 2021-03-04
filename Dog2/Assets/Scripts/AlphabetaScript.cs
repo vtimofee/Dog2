@@ -251,7 +251,7 @@ public class AlphabetaScript : MonoBehaviour
 	bool isFinalTimeScalePaused;
 
 	// important variables to play with
-	private bool isDebugModeOn = false;
+	private bool isDebugModeOn = true;
 	private float resetLerpDuration = 1.5f;
 	private float clockTime = .8f; // .4 is a good one..also 1/3/5 is good proportion
 	private float lerpDuration = 2f; // 1 is a good one
@@ -312,7 +312,7 @@ public class AlphabetaScript : MonoBehaviour
 			punctuationDelay = .1f;
 		}
 
-		//Cursor.visible = false;
+		Cursor.visible = false;
 		InitializeValues();
 		StartPacers();
 		ConvertStrings();
@@ -2760,7 +2760,8 @@ public class AlphabetaScript : MonoBehaviour
 		CancelInvoke("SwapPacer");
 		isResetting = true;
 		questionDestinationRotation = questionHandRotations[0];
-		chimeSound.Play();
+		//chimeSound.Play();
+		cameraScript.finalSound.Play();
 	//	droneTargetPitch = .8f;
 		//droneTargetVolume = .5f;
 		start = false;
@@ -2919,7 +2920,7 @@ public class AlphabetaScript : MonoBehaviour
         else
         {
 			underlineWordCanvas.alpha = 1;
-			underlineSound.Play();
+		//	underlineSound.Play();
 		}
 	}
 

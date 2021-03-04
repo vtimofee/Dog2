@@ -249,7 +249,7 @@ public class CameraScript : MonoBehaviour
 
     public void StartEnd()
     {
-        finalSound.Play();
+       // finalSound.Play();
         animDoll1.SetBool("Reverse", true);
         animDoll2.SetBool("Reverse", true);
         isDialogueStarted = false;
